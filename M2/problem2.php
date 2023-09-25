@@ -1,4 +1,5 @@
 <?php
+//DJA35 - 9/25/2023
 $a1 = [10.001, 11.591, 0.011, 5.991, 16.121, 0.131, 100.981, 1.001];
 $a2 = [1.99, 1.99, 0.99, 1.99, 0.99, 1.99, 0.99, 0.99];
 $a3 = [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01];
@@ -8,7 +9,13 @@ function getTotal($arr) {
     $total = 0.00;
     //note: use the $arr variable, don't directly touch $a1-$a4
     //TODO do adding here
+    foreach ($arr as $value) {
+        $total = $total + $value;
+    }
+
     //TODO do rounding stuff here (round to two decimals i.e., 0.10, 0.01, 0.00)
+    $total = round($total, 2);
+    $total = number_format($total, 2);
     echo "The total is " . var_export($total, true);
 }
 echo "Problem 2: Adding Floats<br>";

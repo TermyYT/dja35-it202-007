@@ -1,4 +1,5 @@
 <?php
+//DJA35 - 9/25/2023
 $a1 = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10];
 $a2 = [-1, 1, -2, 2, 3, -3, -4, 5];
 $a3 = [-0.01, -0.0001, -.15];
@@ -9,6 +10,16 @@ function bePositive($arr) {
     echo "<br>Positive output:<br>";
     //note: use the $arr variable, don't directly touch $a1-$a4
     //TODO use echo to output all of the values as positive (even if they were originally positive) and maintain the original datatype
+    foreach ($arr as $value) {
+        if (is_string($value)) {
+        echo var_dump(strval((abs($value))));
+            echo "\n";
+        } else {
+            echo var_dump(abs($value));
+            echo "\n";
+        }
+        //var_dump($value);
+    }
     //hint: may want to use var_dump() or similar to show final data types
 }
 echo "Problem 3: Be Positive<br>";
