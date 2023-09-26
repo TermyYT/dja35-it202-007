@@ -18,7 +18,6 @@ function bePositive($arr) {
             echo var_dump(abs($value));
             echo "\n";
         }
-        //var_dump($value);
     }
     //hint: may want to use var_dump() or similar to show final data types
 }
