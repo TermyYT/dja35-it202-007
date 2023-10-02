@@ -8,10 +8,10 @@
         window.addEventListener("load", () => {
             console.log("loaded via javascript");
             //TODO: add any extra onload processing you may need here
-            navLinks = document.querySelectorAll("nav a");
-            navLinks.forEach(link => {
-                link.addEventListener("click", click => {
-                    updateCurrentPage(link.textContent);
+            navLinks = document.querySelectorAll("nav a"); // Makes a NodeList matching the selector "nav a".
+            navLinks.forEach(link => { // Loops through the NodeList.
+                link.addEventListener("click", click => { // Adds a click event for each element.
+                    updateCurrentPage(link.textContent); // Every time it's clicked, updateCurrentPage() is called.
                 });
             });
         });
@@ -19,7 +19,7 @@
             setTimeout(() => {
                 //added this delay here as some solutions may require it to update properly (i.e., click code may complete before the navigation changes)
                 //TODO: add code for processing the current selection 
-                console.log("Current selection: " + clickedText);
+                console.log("Current selection: " + clickedText); // Added a way to log the current selection.
                 //Note: likely you'll want to call updateCurrentPage towards the end
             }, 100);
         }
@@ -27,36 +27,36 @@
     <style>
         /* TODO: make edits here */
         nav {
-            text-align: center;
-            background-color: rgb(75, 75, 75);
+            text-align: center; /* Centers the text. */
+            background-color: rgb(75, 75, 75); /* Sets the background color of the navigation bar. */
         }
         nav li {
-            background-color: rgb(175, 175, 175);
-            display: inline;
-            margin-right: 10px;
-            font-weight: bold;
+            background-color: rgb(175, 175, 175); /* Sets the background color of the list items. */
+            display: inline; /* Makes the list items inline and horizontal. */
+            margin-right: 10px; /* Puts a little bit of spacing after every list item. */
+            font-weight: bold; /* Boldens the text for all the list items. */
         }
         nav a {
-            text-decoration: none;
+            text-decoration: none; /* Removes the underline for the link items in the nav bar. */
         }
         nav a:hover {
-            color: rgb(255, 0, 0);
-            background-color: rgb(0, 0, 0);
+            color: rgb(255, 0, 0); /* Sets the color of the list item text when hovered over. */
+            background-color: rgb(0, 0, 0); /* Sets the background color of the list items when hovered over. */
         }
         ul li ul li{
-            list-style: none;
+            list-style: none; /* Takes away the bullet points for the nested list items. */
         }
         ul li ul li:before {
-            content: "✓ ";
+            content: "✓ "; /* Replaces bullet points with checkmark. */
         }
         ul li{
-            list-style: none;
+            list-style: none; /* Takes away the bullet points for the list items. */
         }
         h3 ~ ul li:before {
-            content: "✓ ";
+            content: "✓ "; /* Replaces the bullet points for only the list items preceded by h3. */
         }
         h1, a {
-            text-transform: capitalize;
+            text-transform: capitalize; /* For anywhere there's h1 and a tags, it takes the text and capitalizes it. */
         }
 
     </style>
