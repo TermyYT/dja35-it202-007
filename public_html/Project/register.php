@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . "/../../partials/nav.php");
+require(__DIR__ . "/../../partials/nav.php");
 ?>
 <form onsubmit="return validate(this)" method="POST">
     <div>
@@ -29,37 +29,46 @@ require_once(__DIR__ . "/../../partials/nav.php");
 if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm"])) {
     $email = se($_POST, "email", "", false);
     $password = se($_POST, "password", "", false);
-    $confirm = se($_POST, "confirm", "", false);
+    $confirm = se(
+        $_POST,
+        "confirm",
+        "",
+        false
+    );
+    //TODO 3
     $hasError = false;
     if (empty($email)) {
         echo "Email must not be empty";
         $hasError = true;
     }
     //sanitize
-    $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "Invalid email";
+    $email = sanitize_email($email);
+    //validate
+    if (!is_valid_email($email)) {
+        echo "Invalid email address";
         $hasError = true;
     }
     if (empty($password)) {
-        echo "Password must not be empty";
+        echo "password must not be empty";
         $hasError = true;
     }
     if (empty($confirm)) {
-        echo "Confirm Password must not be empty";
+        echo "Confirm password must not be empty";
         $hasError = true;
     }
     if (strlen($password) < 8) {
-        echo "Password must be >8 characters";
+        echo "Password too short";
         $hasError = true;
     }
-    if (strlen($password) > 0 && $password !== $confirm) {
+    if (
+        strlen($password) > 0 && $password !== $confirm
+    ) {
         echo "Passwords must match";
         $hasError = true;
     }
     if (!$hasError) {
+        echo "Welcome, $email";
         //TODO 4
-        //echo "Welcome, $email";
         $hash = password_hash($password, PASSWORD_BCRYPT);
         $db = getDB();
         $stmt = $db->prepare("INSERT INTO Users (email, password) VALUES(:email, :password)");
@@ -68,7 +77,7 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
             echo "Successfully registered!";
         } catch (Exception $e) {
             echo "There was a problem registering";
-            echo "<pre>" . var_export($e, true) . "</pre>";
+            "<pre>" . var_export($e, true) . "</pre>";
         }
     }
 }
