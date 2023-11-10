@@ -32,6 +32,7 @@ try {
      * Generates an array keyed by filename and valued as raw SQL from file
      * The .sql is important here since this directory may have other files types
      */
+    error_log(var_export(__DIR__, true));
     foreach (glob(__DIR__ . "/*.sql") as $filename) {
         $sql[$filename] = file_get_contents($filename);
     }
