@@ -123,7 +123,6 @@ $username = get_username();
     function validate(form) {
         let newPassword = form.newPassword.value;
         let confirmPassword = form.confirmPassword.value;
-        //TODO add other client side validation....
         let currentPassword = form.currentPassword.value;
         let email = form.email.value;
         let username = form.username.value;
@@ -131,31 +130,43 @@ $username = get_username();
 
         let sanitizedEmail = sanitizeEmail(email);
 
-        if (!isValidEmail(sanitizedEmail)) {
-            flash("Invalid email address", "danger");
+        if (sanitizedEmail === "" || username.trim() === "" || currentPassword.trim() === "") {
+            flash("Email, username, and current password must all be provided", "danger");
             isValid = false;
-        }
-        if (!isValidUsername(username)) {
-            flash("Username must only contain 3-16 characters a-z, 0-9, _, or -", "danger");
-            isValid = false;
-        }
-        if (!isValidPassword(currentPassword)) {
-            flash("Current Password must be at least 8 characters long", "danger");
-            isValid = false;
-        }
-        if (!isValidPassword(newPassword)) {
-            flash("New Password must be at least 8 characters long", "danger");
-            isValid = false;
-        }
-        if (!isValidPassword(confirmPassword)) {
-            flash("Confirm Password must be at least 8 characters long", "danger");
-            isValid = false;
-        }
-        //example of using flash via javascript
-        //find the flash container, create a new element, appendChild
-        if (newPassword !== confirmPassword) {
-            flash("New Password and Confirm Password must match", "warning");
-            isValid = false;
+        } else {
+            if (!isValidEmail(sanitizedEmail)) {
+                flash("Invalid email address", "danger");
+                isValid = false;
+            }
+
+            if (!isValidUsername(username)) {
+                flash("Username must only contain 3-16 characters a-z, 0-9, _, or -", "danger");
+                isValid = false;
+            }
+
+            if (!isValidPassword(currentPassword)) {
+                flash("Current Password must be at least 8 characters long", "danger");
+                isValid = false;
+            }
+            
+            if (newPassword.trim() !== "") {
+                if (!isValidPassword(newPassword)) {
+                    flash("New Password must be at least 8 characters long", "danger");
+                    isValid = false;
+                }
+
+                if (!isValidPassword(confirmPassword)) {
+                    flash("Confirm Password must be at least 8 characters long", "danger");
+                    isValid = false;
+                }
+
+                // Example of using flash via JavaScript
+                // Find the flash container, create a new element, appendChild
+                if (newPassword !== confirmPassword) {
+                    flash("New Password and Confirm Password must match", "warning");
+                    isValid = false;
+                }
+            }
         }
         return isValid;
     }

@@ -110,7 +110,7 @@ if (isset($_POST["email"]) && isset($_POST["password"])) {
                         flash("Invalid password");
                     }
                 } else {
-                    flash("Email not found");
+                    flash("Email/Username not found");
                 }
             }
         } catch (Exception $e) {
