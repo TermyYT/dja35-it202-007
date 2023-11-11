@@ -143,6 +143,14 @@ $username = get_username();
             flash("Current Password must be at least 8 characters long", "danger");
             isValid = false;
         }
+        if (!isValidPassword(newPassword)) {
+            flash("New Password must be at least 8 characters long", "danger");
+            isValid = false;
+        }
+        if (!isValidPassword(confirmPassword)) {
+            flash("Confirm Password must be at least 8 characters long", "danger");
+            isValid = false;
+        }
         //example of using flash via javascript
         //find the flash container, create a new element, appendChild
         if (newPassword !== confirmPassword) {
