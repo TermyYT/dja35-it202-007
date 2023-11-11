@@ -33,7 +33,7 @@ reset_session();
 
         let sanitizedEmail = sanitizeEmail(email);
 
-        if (email.trim() === "") {
+        if (sanitizedEmail === "") {
             flash("Email must not be empty", "danger");
             isValid = false;
         } else if (!isValidEmail(sanitizedEmail)) {
