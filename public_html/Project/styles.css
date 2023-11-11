@@ -13,11 +13,17 @@
 .alert-info {
     background-color: teal;
 }
-nav li{display: inline; background-color: rebeccapurple;}
-nav li a{color: hotpink}
-input{border-radius: 50%;}
+nav li{display: inline; background-color: #7c8bfb;}
+nav li a{
+    color: #000000; 
+    text-decoration: none;
+    width: 2px;
+    border: 2px solid black;
+    padding: 2px;
+    margin: 2px;}
+nav li a:hover{background-color: #c2c9ff;}
+input{border-radius: 2%; padding: 5px;}
 body{
-    background-color: hotpink;
-    color: rgb(153, 0, 153);
-
+    background-color: #7c8bfb;
+    color: #000000;
 }
