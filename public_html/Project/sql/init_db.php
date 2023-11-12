@@ -32,9 +32,15 @@ try {
      * Generates an array keyed by filename and valued as raw SQL from file
      * The .sql is important here since this directory may have other files types
      */
-    error_log(var_export(__DIR__, true));
-    foreach (glob(__DIR__ . "/*.sql") as $filename) {
+    /*foreach (glob(__DIR__ . "/*.sql") as $filename) { //Outdated file reading method because of bug.
         $sql[$filename] = file_get_contents($filename);
+    }*/
+    $files = array_filter(scandir(__DIR__), function ($item) {
+        return is_file(__DIR__ . '/' . $item) && pathinfo($item, PATHINFO_EXTENSION) == 'sql';
+    });
+    
+    foreach ($files as $filename) {
+        $sql[$filename] = file_get_contents(__DIR__ . '/' . $filename);
     }
 
     if (isset($sql) && $sql && count($sql) > 0) {

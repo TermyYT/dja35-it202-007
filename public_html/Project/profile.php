@@ -103,7 +103,8 @@ $username = get_username();
         <input type="text" name="username" id="username" value="<?php se($username); ?>" />
     </div>
     <!-- DO NOT PRELOAD PASSWORD -->
-    <div>Password Reset</div>
+    <br>
+    <div><b>Password Reset</b></div>
     <div class="mb-3">
         <label for="cp">Current Password</label>
         <input type="password" name="currentPassword" id="cp" />
@@ -118,19 +119,54 @@ $username = get_username();
     </div>
     <input type="submit" value="Update Profile" name="save" />
 </form>
-
 <script>
     function validate(form) {
-        let pw = form.newPassword.value;
-        let con = form.confirmPassword.value;
+        let newPassword = form.newPassword.value;
+        let confirmPassword = form.confirmPassword.value;
+        let currentPassword = form.currentPassword.value;
+        let email = form.email.value;
+        let username = form.username.value;
         let isValid = true;
-        //TODO add other client side validation....
 
-        //example of using flash via javascript
-        //find the flash container, create a new element, appendChild
-        if (pw !== con) {
-            flash("Password and Confrim password must match", "warning");
+        let sanitizedEmail = sanitizeEmail(email);
+
+        if (sanitizedEmail === "" || username.trim() === "" || currentPassword.trim() === "") {
+            flash("Email, username, and current password must all be provided", "danger");
             isValid = false;
+        } else {
+            if (!isValidEmail(sanitizedEmail)) {
+                flash("Invalid email address", "danger");
+                isValid = false;
+            }
+
+            if (!isValidUsername(username)) {
+                flash("Username must only contain 3-16 characters a-z, 0-9, _, or -", "danger");
+                isValid = false;
+            }
+
+            if (!isValidPassword(currentPassword)) {
+                flash("Current Password must be at least 8 characters long", "danger");
+                isValid = false;
+            }
+            
+            if (newPassword.trim() !== "") {
+                if (!isValidPassword(newPassword)) {
+                    flash("New Password must be at least 8 characters long", "danger");
+                    isValid = false;
+                }
+
+                if (!isValidPassword(confirmPassword)) {
+                    flash("Confirm Password must be at least 8 characters long", "danger");
+                    isValid = false;
+                }
+
+                // Example of using flash via JavaScript
+                // Find the flash container, create a new element, appendChild
+                if (newPassword !== confirmPassword) {
+                    flash("New Password and Confirm Password must match", "warning");
+                    isValid = false;
+                }
+            }
         }
         return isValid;
     }

@@ -16,10 +16,25 @@ require(__DIR__ . "/../../partials/nav.php");
     function validate(form) {
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
+        let emailOrUsername = form.email.value;
+        let password = form.password.value;
+        let isValid = true;
 
-        //TODO update clientside validation to check if it should
-        //valid email or username
-        return true;
+        // TODO: Add other client-side validation....
+
+        if (emailOrUsername.trim() === "") {
+            flash("Email/Username must not be empty", "danger");
+            isValid = false;
+        }
+
+        if (password.trim() === "") {
+            flash("Password must not be empty", "danger");
+            isValid = false;
+        } else if (!isValidPassword(password)) {
+            flash("Password must be at least 8 characters long", "danger");
+            isValid = false;
+        }
+        return isValid;
     }
 </script>
 <?php
@@ -95,7 +110,7 @@ if (isset($_POST["email"]) && isset($_POST["password"])) {
                         flash("Invalid password");
                     }
                 } else {
-                    flash("Email not found");
+                    flash("Email/Username not found");
                 }
             }
         } catch (Exception $e) {
