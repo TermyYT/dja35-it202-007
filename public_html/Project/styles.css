@@ -22,8 +22,32 @@ nav li a{
     padding: 2px;
     margin: 2px;}
 nav li a:hover{background-color: #c2c9ff;}
-input{border-radius: 2%; padding: 5px;}
+input{
+    border-radius: 2%; 
+    padding: 5px;
+}
 body{
     background-color: #7c8bfb;
     color: #000000;
+}
+table {
+    width: 25%;
+    border-collapse: collapse;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+table, th, td {
+    border: 1px solid white;
+}
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+th {
+    background-color: rgb(50, 50, 50);
+    color: white;
+}
+td {
+    background-color: rgb(155, 155, 155);
+    color:black;
 }
