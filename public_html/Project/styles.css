@@ -17,6 +17,8 @@ nav li{display: inline; background-color: #7c8bfb;}
 nav li a{
     color: #000000; 
     text-decoration: none;
+    font-weight: bold;
+    font-size: large;
     width: 2px;
     border: 2px solid black;
     padding: 2px;
