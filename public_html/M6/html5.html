@@ -1,6 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        canvas:focus{
+            border: 3px solid black;
+        }
+        canvas:not(:focus){
+            border: 1px dotted black;
+        }
+    </style>
+</head>
+
+<body onload="init();">
+    <div>
+    <h1 style="display: inline;">Disco Pong</h1>
+    </div>
+    <a href="https://termyyt.itch.io/p-for-painting">Check out my other game!</a>
+    <main>
+        <canvas tabindex="0" id="board" width="600px" height="400px" >
+
+        </canvas>
+    </main>
+</body>
+    <script>
 // Canvas Pong
 
-var canvas = document.getElementById('canvas');
+var canvas = document.getElementById('board');
 var context = canvas.getContext('2d');
 
 // Key Codes
@@ -69,12 +94,33 @@ function resetBall() {
   ball.sX = ballSpeed;
   ball.sY = ballSpeed / 2;
 }
+// Function for generating a random color hex value.
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+// Function to set the background color.
+function setBackgroundColor(color) {
+  document.body.style.backgroundColor = color;
+}
 
 // Bounce the ball off of a paddle
 function bounceBall() {
+	// Change the ball and paddles' colors upon collision.
+  ball.c = getRandomColor();
+  leftPaddle.c = getRandomColor();
+  rightPaddle.c = getRandomColor();
+  
+  // Change background color upon collision.
+  setBackgroundColor(getRandomColor());
+  
 	// Increase and reverse the X speed
 	if (ball.sX > 0) {
-  	ball.sX += 1;
+  	ball.sX += 0.1; // Decreased acceleration from default.
     // Add some "spin"
     if (keys.UP) {
       ball.sY -= 1;
@@ -82,7 +128,7 @@ function bounceBall() {
       ball.sY += 1;
     }
   } else {
-  	ball.sX -= 1;
+  	ball.sX -= 0.1; // Decreased acceleration from default.
     // Add some "spin"
     if (keys.W) {
       ball.sY -= 1;
@@ -139,7 +185,7 @@ function menu() {
   context.textAlign = 'left';
   context.fillText('Player 1: W (up) and S (down)', 5, (canvas.height / 3) * 2);
   context.textAlign = 'right';
-  context.fillText('Player 2: UP (up) and DOWN (down)', canvas.width - 5, (canvas.height / 3) * 2);
+  context.fillText('Player 2: UP ARROW (up) and DOWN ARROW (down)', canvas.width - 5, (canvas.height / 3) * 2);
   // Start the game on a click
   canvas.addEventListener('click', startGame);
 }
@@ -214,15 +260,20 @@ function draw() {
       bounceBall();
     }
   }
+  // Checks for seeing if the score changed.
+  var leftScoreChanged = false;
+  var rightScoreChanged = false;
   // Score if the ball goes past a paddle
   if (ball.x < leftPaddle.x) {
     rightScore++;
     resetBall();
     ball.sX *= -1;
+    rightScoreChanged = true;
   } else if (ball.x + ball.w > rightPaddle.x + rightPaddle.w) {
     leftScore++;
     resetBall();
     ball.sX *= -1;
+    leftScoreChanged = true;
   }
   // Draw the paddles and ball
   leftPaddle.draw();
@@ -235,6 +286,15 @@ function draw() {
   context.fillText('Score: ' + leftScore, 5, 24);
   context.textAlign = 'right';
   context.fillText('Score: ' + rightScore, canvas.width - 5, 24);
+  // Adjust the paddle sizes based on scores
+  if (leftScoreChanged) {
+    leftPaddle.h -= 5; // Decrease paddle height by 5.
+    leftPaddle.h = Math.max(leftPaddle.h, 50); // Minimum paddle height of 50.
+  }
+  if (rightScoreChanged) {
+    rightPaddle.h -= 5; // Decrease paddle height by 5.
+    rightPaddle.h = Math.max(rightPaddle.h, 50); // Minimum paddle height of 50.
+  }
   // End the game or keep going
   if (leftScore === 10 || rightScore === 10) {
   	endGame();
@@ -246,3 +306,6 @@ function draw() {
 // Show the menu to start the game
 menu();
 canvas.focus();
+    </script>
+
+</html>
