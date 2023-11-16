@@ -94,6 +94,7 @@ function resetBall() {
   ball.sX = ballSpeed;
   ball.sY = ballSpeed / 2;
 }
+// DJA35 - 11/15/2023
 // Function for generating a random color hex value.
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
@@ -260,6 +261,7 @@ function draw() {
       bounceBall();
     }
   }
+  // DJA35 - 11/15/2023
   // Checks for seeing if the score changed.
   var leftScoreChanged = false;
   var rightScoreChanged = false;
@@ -286,6 +288,7 @@ function draw() {
   context.fillText('Score: ' + leftScore, 5, 24);
   context.textAlign = 'right';
   context.fillText('Score: ' + rightScore, canvas.width - 5, 24);
+  // DJA35 - 11/15/2023
   // Adjust the paddle sizes based on scores
   if (leftScoreChanged) {
     leftPaddle.h -= 5; // Decrease paddle height by 5.
