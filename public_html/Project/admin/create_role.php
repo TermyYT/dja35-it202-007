@@ -22,24 +22,21 @@ if (isset($_POST["name"]) && isset($_POST["description"])) {
             if ($e->errorInfo[1] === 1062) {
                 flash("A role with this name already exists, please try another", "warning");
             } else {
-                flash(var_export($e->errorInfo, true), "danger");
+                flash("Unknown error occurred, please try again", "danger");
+                error_log(var_export($e->errorInfo, true));
             }
         }
     }
 }
 ?>
-<h1>Create Role</h1>
-<form method="POST">
-    <div>
-        <label for="name">Name</label>
-        <input id="name" name="name" required />
-    </div>
-    <div>
-        <label for="d">Description</label>
-        <textarea name="description" id="d"></textarea>
-    </div>
-    <input type="submit" value="Create Role" />
-</form>
+<div class="container-fluid">
+    <h1>Create Role</h1>
+    <form method="POST">
+        <?php render_input(["id" => "name", "name" => "name", "label" => "Name", "rules" => ["required" => true]]); ?>
+        <?php render_input(["type" => "textarea", "id" => "name", "name" => "name", "label" => "Description", "rules" => ["required" => true]]); ?>
+        <?php render_button(["text" => "Create Role", "type" => "submit"]); ?>
+    </form>
+</div>
 <?php
 //note we need to go up 1 more directory
 require_once(__DIR__ . "/../../../partials/flash.php");
