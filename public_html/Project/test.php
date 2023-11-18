@@ -52,7 +52,7 @@ if (isset($_POST["username"])) {
     if (!empty($username)) {
         $db = getDB();
         $stmt = $db->prepare("SELECT Users.id, username, 
-        (SELECT GROUP_CONCAT(name, ' (' , IF(ur.is_active = 1,'active','inactive') , ')') from
+        (SELECT GROUP_CONCAT(name, ' (' , IF(ur.is_active = 1,'active','inactive') , ')') from 
         UserRoles ur JOIN Roles on ur.role_id = Roles.id WHERE ur.user_id = Users.id) as roles
         from Users WHERE username like :username");
         try {
