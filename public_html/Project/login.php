@@ -42,10 +42,10 @@ if (isset($_POST["email"]) && isset($_POST["password"])) {
     //TODO 3
     $hasError = false;
     if (empty($email)) {
-        flash("Email must not be empty");
+        flash("Email must not be empty", "danger");
         $hasError = true;
     }
-        //sanitize
+    //sanitize
     //$email = filter_var($email, FILTER_SANITIZE_EMAIL);
 
     //validate
@@ -63,21 +63,21 @@ if (isset($_POST["email"]) && isset($_POST["password"])) {
             $hasError = true;
         }*/
         if (!is_valid_email($email)) {
-            flash("Invalid email address");
+            flash("Invalid email address", "danger");
             $hasError = true;
         }
     } else {
         if (!is_valid_username($email)) {
-            flash("Invalid username");
+            flash("Invalid username", "danger");
             $hasError = true;
         }
     }
     if (empty($password)) {
-        flash("password must not be empty");
+        flash("Password must not be empty", "danger");
         $hasError = true;
     }
     if (!is_valid_password($password)) {
-        flash("Password too short");
+        flash("Password too short", "danger");
         $hasError = true;
     }
     if (!$hasError) {
@@ -114,10 +114,10 @@ if (isset($_POST["email"]) && isset($_POST["password"])) {
                         flash("Welcome, " . get_username());
                         die(header("Location: home.php"));
                     } else {
-                        flash("Invalid password");
+                        flash("Invalid password", "danger");
                     }
                 } else {
-                    flash("Email/Username not found");
+                    flash("Email/Username not found", "danger");
                 }
             }
         } catch (Exception $e) {
