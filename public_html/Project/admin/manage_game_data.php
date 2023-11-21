@@ -27,8 +27,8 @@ function insert_games_into_db($db, $games, $mappings)
         }
 
         $query .= implode(",", $values);
+        
         // Generate the ON DUPLICATE KEY UPDATE clause
-
         $updates = array_reduce($cols, function ($carry, $col) {
             $carry[] = "`$col` = VALUES(`$col`)";
             return $carry;
@@ -71,17 +71,17 @@ function process_single_game($game, $columns, $mappings)
     $record["description"] = se($game, "description", "", false);
 
     //Parse date from API in the format of MySQL's DATETIME
-    $effectiveDate = se($game, "effectiveDate", "", false);
-    $dateTime = new DateTime($effectiveDate);
-    $record["effectiveDate"] = $dateTime->format("Y-m-d H:i:s");
+    $releaseDate = se($game, "releaseDate", "", false);
+    $dateTime = new DateTime($releaseDate);
+    $record["releaseDate"] = $dateTime->format("Y-m-d H:i:s");
 
     $record["url"] = se($game, "url", "", false);
-    $record["originalPrice"] = (int)se($game["price"]["totalPrice"], "originalPrice", 0, false);
+    $record["currentPrice"] = (int)se($game, "currentPrice", 0, false);
     $record["discountPrice"] = (int)se($game["price"]["totalPrice"], "discountPrice", 0, false);
     $record["currencyCode"] = se($game["price"]["totalPrice"], "currencyCode", "", false);
 
     // Map game data to columns - for things with duplicate names
-/*    foreach ($columns as $column) {        
+    /*    foreach ($columns as $column) {        
         if (array_key_exists($column, $game)) {
             $record[$column] = $game[$column];
             if (empty($record[$column])) {
@@ -95,7 +95,7 @@ function process_single_game($game, $columns, $mappings)
     return $record;
 }
 
-function process_games($result)
+function process_games($result, $searchTerm = null)
 {
     $status = se($result, "status", 400, false);
     if ($status != 200) {
@@ -111,31 +111,49 @@ function process_games($result)
     }
     $data = $data["data"];
     error_log("data: " . var_export($data, true));
+    $status = se($data, "status", "", false);
+    error_log("Status: " . var_export($status, true));
+    if ($status == "No games found") {
+        flash("No games were found. Please try again.", "warning");
+        return;
+    }
     // Get columns from Games table
-    $db = getDB();
-    $stmt = $db->prepare("SHOW COLUMNS FROM Games");
-    $stmt->execute();
-    $columnsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!empty($data)) {
+        $db = getDB();
+        $stmt = $db->prepare("SHOW COLUMNS FROM Games");
+        $stmt->execute();
+        $columnsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Prepare columns and mappings
-    $columns = array_column($columnsData, 'Field');
-    $mappings = [];
-    foreach ($columnsData as $column) {
-        $mappings[$column['Field']] = $column['Type'];
-    }
-    $ignored = ["id", "created", "modified"];
-    $columns = array_diff($columns, $ignored);
+        // Prepare columns and mappings
+        $columns = array_column($columnsData, 'Field');
+        $mappings = [];
+        foreach ($columnsData as $column) {
+            $mappings[$column['Field']] = $column['Type'];
+        }
+        $ignored = ["id", "created", "modified"];
+        $columns = array_diff($columns, $ignored);
 
-    // Process each game
-    $games = [];
-    foreach ($data as $game) {
-        $record = process_single_game($game, $columns, $mappings);
-        array_push($games, $record);
+        // Process each game
+        $games = [];
+        foreach ($data as $game) {
+            // Check if the game title contains the search term
+            /*if ($searchTerm !== null && stripos($game['title'], $searchTerm) === false) {
+                continue; // Skip this game if the title doesn't match the search term
+            }*/
+            $record = process_single_game($game, $columns, $mappings);
+            array_push($games, $record);
+        }
+        // Insert games into database
+        insert_games_into_db($db, $games, $mappings);
+    } else {
+        flash("No games were found. Please try again.", "warning");
     }
-    // Insert games into database
-    insert_games_into_db($db, $games, $mappings);
 }
-
+function process_search($searchTerm)
+{
+    $result = get("https://epic-store-games.p.rapidapi.com/onSale", "GAME_API_KEY", ["searchWords" => $searchTerm, "limit" => 75, "page" => 0], true);
+    process_games($result, $searchTerm);
+}
 $action = se($_POST, "action", "", false);
 if ($action) {
     switch ($action) {
@@ -143,10 +161,13 @@ if ($action) {
             $result = get("https://epic-store-games.p.rapidapi.com/onSale", "GAME_API_KEY", ["limit" => 75, "page" => 0], true);
             process_games($result);
             break;
+        case "search":
+            $searchTerm = se($_POST, "searchTerm", "", false);
+            process_search($searchTerm);
+            break;
     }
 }
 ?>
-
 <div class="container-fluid">
     <h1>Game Data Management</h1>
     <div class="row">
@@ -158,4 +179,20 @@ if ($action) {
             </form>
         </div>
     </div>
+
+    <!-- Search form -->
+    <div class="row mt-3">
+        <div class="col">
+            <form method="POST">
+                <input type="hidden" name="action" value="search" />
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search for games..." name="searchTerm" />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+<?php require_once(__DIR__ . "/../../../partials/flash.php");
