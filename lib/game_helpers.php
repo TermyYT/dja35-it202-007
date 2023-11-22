@@ -159,7 +159,7 @@ function get_images_by_breed_id($breed_id, $random = false, $retries=3)
     return $images;
 }
 
-function validate_cat($cat){
+function validate_game($cat){
     error_log("cat: " . var_export($cat, true));
     $name = se($cat, "name", "", false);
     $has_error = false;
