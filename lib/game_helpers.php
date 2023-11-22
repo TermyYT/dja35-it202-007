@@ -159,7 +159,7 @@ function get_images_by_breed_id($breed_id, $random = false, $retries=3)
     return $images;
 }
 
-function validate_game($cat){
+function validate_cat($cat){
     error_log("cat: " . var_export($cat, true));
     $name = se($cat, "name", "", false);
     $has_error = false;
@@ -212,4 +212,71 @@ function validate_game($cat){
         $has_error = true;
     }
     return !$has_error;
+}
+function validate_game($game) {
+    error_log("game: " . var_export($game, true));
+    $title = se($game, "title", "", false);
+    $publisherName = se($game, "publisherName", "", false);
+    $description = se($game, "description", "", false);
+    $releaseDate = se($game, "releaseDate", "", false);
+    $url = se($game, "url", "", false);
+    $currentPrice = (int)se($game, "currentPrice", -1, false);
+    $discountPrice = (int)se($game, "discountPrice", -1, false);
+    $currencyCode = se($game, "currencyCode", "", false);
+
+    $has_error = false;
+
+    // Title rules
+    if (empty($title) || strlen($title) < 2) {
+        flash("Title must be at least 2 characters long", "warning");
+        $has_error = true;
+    }
+    // Publisher Name
+    if (empty($publisherName) || strlen($publisherName) < 2) {
+        flash("Publisher name must be at least 2 characters long", "warning");
+        $has_error = true;
+    }
+    // Description
+    if (empty($description)) {
+        flash("Description cannot be empty", "warning");
+        $has_error = true;
+    }
+    // Release Date
+    if (!empty($releaseDate) && !validate_date($releaseDate)) {
+        flash("Invalid Release Date format", "warning");
+        $has_error = true;
+    }
+    // URL
+    if (empty($url) || strpos($url, "https://store.epicgames.com/") !== 0) {
+        flash("URL must start with 'https://store.epicgames.com/'", "warning");
+        $has_error = true;
+    }
+    // Current Price
+    if ($currentPrice == -1) {
+        flash("Current Price must be entered", "warning");
+        $has_error = true;
+    } else if ($currentPrice < 0) {
+        flash("Current Price must be a non-negative value", "warning");
+        $has_error = true;
+    }
+    // Discount Price
+    if ($discountPrice == -1) {
+        flash("Discount Price must be entered", "warning");
+        $has_error = true;
+    } else if ($discountPrice < 0) {
+        flash("Discount Price must be a non-negative value", "warning");
+        $has_error = true;
+    }
+    // Currency Code
+    if (strlen($currencyCode) != 3) {
+        flash("Invalid currency code", "warning");
+        $has_error = true;
+    }
+    return !$has_error;
+}
+
+// Additional function to validate date format in validate_game()
+function validate_date($date) {
+    $d = DateTime::createFromFormat('Y-m-d', $date);
+    return $d && $d->format('Y-m-d') === $date;
 }

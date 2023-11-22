@@ -73,7 +73,7 @@ function process_single_game($game, $columns, $mappings)
     //Parse date from API in the format of MySQL's DATETIME
     $releaseDate = se($game, "releaseDate", "", false);
     $dateTime = new DateTime($releaseDate);
-    $record["releaseDate"] = $dateTime->format("Y-m-d H:i:s");
+    $record["releaseDate"] = $dateTime->format("Y-m-d");
 
     $record["url"] = se($game, "url", "", false);
     $record["currentPrice"] = (int)se($game, "currentPrice", 0, false);
