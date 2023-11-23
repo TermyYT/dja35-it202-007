@@ -14,9 +14,9 @@ if (count($_POST) > 0) {
     $game = $_POST;
     // Perform validation and other necessary checks
 
-    if (empty($game['title']) || strlen($game['title']) < 2) {
+    /*if (empty($game['title']) || strlen($game['title']) < 2) {
         flash("Invalid input. Please make sure your title is longer than 2 characters.", "danger");
-    } else {
+    } else {*/
         // Additional validation and processing can be added
 
         if (validate_game($game)) {
@@ -37,7 +37,7 @@ if (count($_POST) > 0) {
         } else {
             flash("Invalid input. Please check your data and try again.", "danger");
         }
-    }
+    /*}*/
 }
 
 if ($id > 0) {
@@ -64,17 +64,17 @@ if ($id > 0) {
 ?>
 
 <div class="container-fluid">
-    <h1>Game Profile</h1>
+    <h1>Game Profile (Create/Update)</h1>
     <a class="btn btn-secondary" href="<?php get_url($back, true); ?>">Back</a>
     <form method="POST">
         <?php render_input(["type" => "text", "id" => "title", "name" => "title", "label" => "Title", "rules" => ["minlength" => 2, "required" => true], "value" => se($game, "title", "", false)]); ?>
         <?php render_input(["type" => "text", "id" => "publisherName", "name" => "publisherName", "label" => "Publisher", "rules" => ["minlength" => 2, "required" => true], "value" => se($game, "publisherName", "", false)]); ?>
         <?php render_input(["type" => "textarea", "id" => "description", "name" => "description", "label" => "Description", "rules" => ["minlength" => 2, "required" => true], "value" => se($game, "description", "", false)]); ?>
         <?php render_input(["type" => "date", "id" => "releaseDate", "name" => "releaseDate", "label" => "Release Date", "rules" => ["required" => true], "value" => se($game, "releaseDate", date("Y-m-d"), false)]); ?>
-        <?php render_input(["type" => "text", "id" => "url", "name" => "url", "label" => "URL", "value" => se($game, "url", "", false)]); ?>
-        <?php render_input(["type" => "number", "id" => "currentPrice", "name" => "currentPrice", "label" => "Current Price", "rules" => ["min" => 0, "required" => true], "value" => se($game, "currentPrice", "0", false)]); ?>
-        <?php render_input(["type" => "number", "id" => "discountPrice", "name" => "discountPrice", "label" => "Discount Price", "rules" => ["min" => 0, "required" => true], "value" => se($game, "discountPrice", "0", false)]); ?>
-        <?php render_input(["type" => "text", "id" => "currencyCode", "name" => "currencyCode", "label" => "Currency Code", "rules" => ["minlength" => 3, "maxlength" => 3, "required" => true], "value" => se($game, "currencyCode", "", false)]); ?>
+        <?php render_input(["type" => "text", "id" => "url", "name" => "url", "label" => "URL (https://store.epicgames.com/GameLinkHere)", "rules" => ["minlength" => 28, "required" => true], "value" => se($game, "url", "", false)]); ?>
+        <?php render_input(["type" => "number", "id" => "currentPrice", "name" => "currentPrice", "label" => "Current Price (\$1.00 = 100)", "rules" => ["min" => 0, "required" => true], "value" => se($game, "currentPrice", "0", false)]); ?>
+        <?php render_input(["type" => "number", "id" => "discountPrice", "name" => "discountPrice", "label" => "Discount Price (\$1.00 = 100)", "rules" => ["min" => 0, "required" => true], "value" => se($game, "discountPrice", "0", false)]); ?>
+        <?php render_input(["type" => "text", "id" => "currencyCode", "name" => "currencyCode", "label" => "Currency Code (XYZ)", "rules" => ["minlength" => 3, "maxlength" => 3, "required" => true], "value" => se($game, "currencyCode", "", false)]); ?>
         <?php render_button(["text" => "Save", "type" => "submit"]); ?>
     </form>
 </div>
