@@ -28,6 +28,19 @@ if ($id > 0) {
     flash("Invalid game ID", "danger");
     // redirect or handle accordingly
 }
+$canDelete = true;
+if (isset($_POST["delete"])) {
+    $query = "DELETE FROM Games WHERE id = :id";
+    $stmt = $db->prepare($query);
+    try {
+        $stmt->execute([":id" => $id]);
+        flash("Game deleted successfully", "success");
+        redirect(get_url($back, true));
+    } catch (PDOException $e) {
+        error_log("Error deleting game by id: " . var_export($e, true));
+        flash("An error occurred while deleting the game", "danger");
+    }
+}
 ?>
 <div class="container-fluid">
     <h1 class="mb-3">Game Viewer (Update/Delete)</h1>
@@ -45,12 +58,30 @@ if ($id > 0) {
                 <li class="list-group-item"><b>Discount Price:</b> <?php echo se($game, "discountPrice", "", true); ?></li>
                 <li class="list-group-item"><b>Currency Code:</b> <?php echo se($game, "currencyCode", "", true); ?></li>
             </ul>
-            <a href="<?php echo get_url("admin/game_profile.php?id=$id"); ?>" class="btn btn-primary mt-3">Edit</a>
+            <div class="mt-3">
+                <a href="<?php echo get_url("admin/game_profile.php?id=$id"); ?>" class="btn btn-primary mr-2">Edit</a>
+                <!-- Delete button (Will only be shown for admins; users will have Delete button removed) -->
+                <?php if ($canDelete): ?>
+                    <form method="post" style="display: inline;">
+                        <input type="hidden" name="delete" value="true">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('WARNING: Are you sure you want to delete this game permanently?')">Delete</button>
+                    </form>
+                <?php endif; ?>
+            </div>
         </div>
         <div class="card-footer text-muted">
-        <?php
-            $modifiedDate = new DateTime($game['modified']);
-            echo "Last modified: " . $modifiedDate->format('Y-m-d H:i:s');
+        <?php // Formats modification date for each record's card.
+        try {
+            if (isset($game['modified'])) {
+                $modifiedDate = new DateTime($game['modified']);
+                echo "Last modified: " . $modifiedDate->format('Y-m-d H:i:s');
+            } else {
+                throw new Exception("Modified date not available.");
+            }
+        }
+        catch (Exception $e) {
+            error_log("Error fetching modification date: " . var_export($e, true));
+        }
         ?>
         </div>
     </div>

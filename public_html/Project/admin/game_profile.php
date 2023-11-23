@@ -57,7 +57,7 @@ if ($id > 0) {
         }
     } catch (PDOException $e) {
         error_log("Error fetching game by id: " . var_export($e, true));
-        flash("An unhandled error occurred", "danger");
+        flash("An error fetching game by id has occured", "danger");
         //redirect("admin/game_list.php");
     }
 }
