@@ -1,6 +1,7 @@
 <?php
 require(__DIR__ . "/../../../partials/nav.php");
 
+$canDelete = true;
 $id = (int)se($_GET, "id", 0, false);
 $game = [];
 
@@ -24,11 +25,7 @@ if ($id > 0) {
         flash("An unhandled error occurred", "danger");
         // redirect or handle accordingly
     }
-} else {
-    flash("Invalid game ID", "danger");
-    // redirect or handle accordingly
 }
-$canDelete = true;
 if (isset($_POST["delete"])) {
     $query = "DELETE FROM Games WHERE id = :id";
     $stmt = $db->prepare($query);

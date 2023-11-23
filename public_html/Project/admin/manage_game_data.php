@@ -145,6 +145,7 @@ function process_games($result, $searchTerm = null)
         }
         // Insert games into database
         insert_games_into_db($db, $games, $mappings);
+        flash ("Games added to database", "success");
     } else {
         flash("No games were found. Please try again.", "warning");
     }
@@ -167,9 +168,7 @@ if ($action) {
             break;
     }
 }
-?>
-<div class="container-fluid">
-    <h1>Game Data Management</h1>
+/* Placing this here because HTML commenting is being uncooperative.
     <div class="row">
         <div class="col">
             <!-- Game refresh button -->
@@ -179,6 +178,10 @@ if ($action) {
             </form>
         </div>
     </div>
+*/
+?>
+<div class="container-fluid">
+    <h1>Game Database Management</h1>
 
     <!-- Search form -->
     <div class="row mt-3">
