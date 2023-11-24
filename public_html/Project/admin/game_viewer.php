@@ -1,7 +1,7 @@
 <?php
 require(__DIR__ . "/../../../partials/nav.php");
 
-$canDelete = true;
+//$canDelete = true;
 $id = (int)se($_GET, "id", 0, false);
 $game = [];
 
@@ -27,7 +27,7 @@ if ($id > 0) {
     }
 }
 if (isset($_POST["delete"])) {
-    $query = "DELETE FROM Games WHERE id = :id";
+    /*$query = "DELETE FROM Games WHERE id = :id";
     $stmt = $db->prepare($query);
     try {
         $stmt->execute([":id" => $id]);
@@ -37,6 +37,7 @@ if (isset($_POST["delete"])) {
         error_log("Error deleting game by id: " . var_export($e, true));
         flash("An error occurred while deleting the game", "danger");
     }
+    delete_game($db, $id, $back);*/
 }
 ?>
 <div class="container-fluid">
@@ -58,12 +59,12 @@ if (isset($_POST["delete"])) {
             <div class="mt-3">
                 <a href="<?php echo get_url("admin/game_profile.php?id=$id"); ?>" class="btn btn-primary mr-2">Edit</a>
                 <!-- Delete button (Will only be shown for admins; users will have Delete button removed) -->
-                <?php if ($canDelete): ?>
+
                     <form method="post" style="display: inline;">
                         <input type="hidden" name="delete" value="true">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('WARNING: Are you sure you want to delete this game permanently?')">Delete</button>
                     </form>
-                <?php endif; ?>
+
             </div>
         </div>
         <div class="card-footer text-muted">

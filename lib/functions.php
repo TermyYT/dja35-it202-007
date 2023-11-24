@@ -36,5 +36,5 @@ require(__DIR__ . "/update_data.php");
 //Save Data
 require(__DIR__ . "/save_data.php");
 //Redirect
-require(__DIR__ . "/redirect.php");
+require(__DIR__ . "/redirect.php")
 ?>

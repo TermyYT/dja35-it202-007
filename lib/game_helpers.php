@@ -1,5 +1,5 @@
 <?php
-
+$VALID_ORDER_COLUMNS = ["title", "publisherName", "releaseDate", "currentPrice", "discountPrice", "id"];
 function get_images_from_api_by_breed($api_breed_id)
 {
     $data = [
@@ -212,6 +212,295 @@ function validate_cat($cat){
         $has_error = true;
     }
     return !$has_error;
+}
+function get_breed_by_id($id)
+{
+    error_log("Checking breed: " . var_export($id, true));
+    $db = getDB();
+    // In this case I do want all the data
+    $query = "SELECT * FROM CA_Breeds WHERE id = :id";
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":id", $id);
+    try {
+        $stmt->execute();
+        $result = $stmt->fetch();
+        //error_log("Breed results: " . var_export($result, true));
+        return $result;
+    } catch (PDOException $e) {
+        error_log("Error fetching breeds from db: " . var_export($e, true));
+    }
+    return [];
+}
+
+function get_temperaments()
+{
+    $db = getDB();
+    $query = "SELECT id, name FROM CA_Temperaments;";
+    $stmt = $db->prepare($query);
+    try {
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        return $result;
+    } catch (PDOException $e) {
+        error_log("Error fetching temperaments from db: " . var_export($e, true));
+    }
+    return [];
+}
+
+function search_games()
+{
+    // Initialize variables
+    global $search; // make search available outside of this function
+    $search = $_GET;
+    $games = [];
+    $params = [];
+
+    // Build the SQL query
+    $query = _build_search_query($params, $search);
+
+    // Prepare the SQL statement
+    $db = getDB();
+    $stmt = $db->prepare($query);
+
+    // Bind parameters to the SQL statement
+    bind_params($stmt, $params);
+    error_log("search query: " . var_export($query, true));
+    error_log("params: " . var_export($params, true));
+
+    // Execute the SQL statement and fetch results
+    try {
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($result) {
+            $games = $result;
+        }
+    } catch (PDOException $e) {
+        flash("An error occurred while searching for games: " . $e->getMessage(), "warning");
+        error_log("Game Search Error: " . var_export($e, true));
+    }
+
+    return $games;
+}
+
+// Note: & tells php to pass by reference so any changes made to $params are reflected outside of the function
+function _build_search_query_old(&$params, $search)
+{
+    $query = "SELECT 
+            c.id, 
+            c.breed_id,
+            c.name, 
+            c.description, 
+            b.name as breed, 
+            CASE 
+                WHEN c.sex = 'm' THEN 'Male'
+                WHEN c.sex = 'f' THEN 'Female'
+                ELSE 'N/A'
+            END as sex, 
+            c.fixed, 
+            TIMESTAMPDIFF(YEAR, c.born, CURDATE()) AS age, 
+            c.status,
+            (SELECT GROUP_CONCAT(url SEPARATOR ', ') FROM CA_CatImages as CI JOIN CA_Images I on I.id = CI.image_id WHERE CI.cat_id = c.id LIMIT :image_limit) as urls,
+            (SELECT GROUP_CONCAT(t.name SEPARATOR ', ') FROM CA_Temperaments t JOIN CA_BreedTemperaments bt on t.id = bt.temperament_id WHERE bt.breed_id = c.breed_id LIMIT 1) as temperament
+            FROM 
+            CA_Cats as c JOIN CA_Breeds as b on c.breed_id = b.id
+            WHERE 1=1";
+    $params[":image_limit"] = 1;
+    // Add conditions to the query based on the search parameters
+    foreach ($search as $key => $value) {
+        if ($value == 0 || !empty($value)) {
+            switch ($key) {
+                case 'breed_id':
+                    $params[":breed_id"] = $value;
+                    $query .= " AND c.breed_id = :breed_id";
+                    break;
+                case 'status':
+                    $params[":status"] = $value;
+                    $query .= " AND c.status = :status";
+                    break;
+                case 'sex':
+                    $params[":sex"] = $value;
+                    $query .= " AND sex = :sex";
+                    break;
+                case 'fixed':
+                    $params[":fixed"] = $value;
+                    $query .= " AND fixed = :fixed";
+                    break;
+                case 'age_min':
+                case 'age_max':
+                    $min = se($search, "age_min", "0", false);
+                    $max = se($search, "age_max", "999", false);
+                    if (empty($min)) {
+                        $min = "0";
+                    }
+                    if (empty($max)) {
+                        $max = "999";
+                    }
+                    $params[":age_min"] = $min;
+                    $params[":age_max"] = $max;
+                    $query .= " AND TIMESTAMPDIFF(YEAR, c.born, CURDATE()) BETWEEN :age_min AND :age_max ";
+                    break;
+                case 'name':
+                    $params[":name"] = "%$value%"; //partial match
+                    $query .= " AND c.name like :name";
+                    break;
+                case 'temperament':
+                    $i = 0;
+                    $keys = [];
+                    foreach ($value as $t) {
+                        if (empty($t)) { //ignore "any"
+                            continue;
+                        }
+                        $params[":t$i"] = $t;
+                        array_push($keys, ":t$i");
+                        $i++;
+                    }
+                    if (count($keys) > 0) {
+                        $keys = join(",", $keys);
+                        $query .= " AND c.breed_id in (SELECT bt.breed_id FROM CA_Temperaments t JOIN CA_BreedTemperaments bt on t.id = bt.temperament_id WHERE t.id in ($keys))";
+                    }
+                    break;
+                case "id":
+                    $params[":id"] = $value;
+                    $query .= " AND c.id = :id";
+                    break;
+                case "image_limit":
+                    $params[":image_limit"] = (int)$value;
+                    break;
+            }
+        }
+    }
+
+    if (!has_role("Admin")) {
+        $query .= " AND status != 'unavailable'";
+    }
+    // order by
+    if (isset($search["column"]) && !empty($search["column"]) && isset($search["order"]) && !empty($search["order"])) {
+        global $VALID_ORDER_COLUMNS;
+        $col = $search["column"];
+        $order = $search["order"];
+        // prevent SQL injection by checking it against a hard coded list
+        if (!in_array($col, $VALID_ORDER_COLUMNS)) {
+            $col = "name";
+        }
+        if (!in_array($order, ["asc", "desc"])) {
+            $order = "asc";
+        }
+        // special mapping to use table name prefix to resolve ambiguity error
+        if (in_array($col, ["created", "modified"])) {
+            $col = "c.$col";
+        }
+        $query .= " ORDER BY $col $order"; //<-- be absolutely sure you trust these values; we can't bind certain parts of the query due to how the parameter mapping works
+    }
+    // limit last
+    $query .= " LIMIT 10";
+
+
+    return $query;
+}
+function _build_search_query(&$params, $search)
+{
+    $query = "SELECT 
+            g.id, 
+            g.title, 
+            g.publisherName, 
+            g.description, 
+            g.releaseDate, 
+            g.url, 
+            g.currentPrice, 
+            g.discountPrice, 
+            g.currencyCode,
+            g.created,
+            g.modified
+            FROM 
+            Games AS g
+            WHERE 1=1";
+
+    // Add conditions to the query based on the search parameters
+    foreach ($search as $key => $value) {
+        if ($value == 0 || !empty($value)) {
+            switch ($key) {
+                case 'title':
+                    $params[":title"] = $value;
+                    $query .= " AND g.title LIKE :title";
+                    break;
+                case 'publisherName':
+                    $params[":publisherName"] = $value;
+                    $query .= " AND g.publisherName LIKE :publisherName";
+                    break;
+                case 'description':
+                    $params[":description"] = $value;
+                    $query .= " AND g.description LIKE :description";
+                    break;
+                case 'releaseDate':
+                    // Assuming $value is a valid date, you may need to validate it
+                    $params[":releaseDate"] = $value;
+                    $query .= " AND g.releaseDate = :releaseDate";
+                    break;
+                case 'url':
+                    $params[":url"] = $value;
+                    $query .= " AND g.url LIKE :url";
+                    break;
+                case 'currentPrice':
+                    $params[":currentPrice"] = $value;
+                    $query .= " AND g.currentPrice = :currentPrice";
+                    break;
+                case 'discountPrice':
+                    $params[":discountPrice"] = $value;
+                    $query .= " AND g.discountPrice = :discountPrice";
+                    break;
+                case 'currencyCode':
+                    $params[":currencyCode"] = $value;
+                    $query .= " AND g.currencyCode = :currencyCode";
+                    break;
+                case "id":
+                    $params[":id"] = $value;
+                    $query .= " AND g.id = :id";
+                    break;
+            }
+        }
+    }
+    if (!has_role("Admin")) {
+        $query .= " AND status != 'unavailable'";
+    }
+    // Order by
+    if (isset($search["column"]) && !empty($search["column"]) && isset($search["order"]) && !empty($search["order"])) {
+        global $VALID_ORDER_COLUMNS;
+        $col = $search["column"];
+        $order = $search["order"];
+        // Prevent SQL injection by checking against a hard-coded list
+        if (!in_array($col, $VALID_ORDER_COLUMNS)) {
+            $col = "title";
+        }
+        if (!in_array($order, ["asc", "desc"])) {
+            $order = "asc";
+        }
+        // special mapping to use table name prefix to resolve ambiguity error
+        if (in_array($col, ["created", "modified"])) {
+            $col = "c.$col";
+        }
+        $query .= " ORDER BY $col $order"; //<-- be absolutely sure you trust these values; we can't bind certain parts of the query due to how the parameter mapping works
+    }
+
+    // Limit last
+    $query .= " LIMIT 10";
+
+    return $query;
+}
+/**
+ * Dynamically binds parameters based on value data type
+ */
+function bind_params($stmt, $params)
+{
+    // Bind parameters to the SQL statement
+    foreach ($params as $k => $v) {
+        $type = PDO::PARAM_STR;
+        if (is_null($v)) {
+            $type = PDO::PARAM_NULL;
+        } else if (is_numeric($v)) {
+            $type = PDO::PARAM_INT;
+        }
+        $stmt->bindValue($k, $v, $type);
+    }
 }
 function validate_game($game) {
     error_log("game: " . var_export($game, true));
