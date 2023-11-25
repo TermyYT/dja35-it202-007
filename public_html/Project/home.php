@@ -10,7 +10,7 @@ if (is_logged_in(true)) {
 }
 ?>
 <div class="container-fluid">
-    <div class="h-50 p-5 text-bg-dark rounded-3">
+    <div class="h-30 p-5 text-bg-dark rounded-3">
         <h1>Welcome to the Epic Games Wishlister!</h1>
         <p>Do you want to have a personal wishlist for games sold on Epic Games?</p>
         <p>Do you want up-to-date information on sales going on?</p>

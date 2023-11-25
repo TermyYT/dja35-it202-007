@@ -1,5 +1,5 @@
 <?php
-require(__DIR__ . "/../../../partials/nav.php");
+require(__DIR__ . "/../../partials/nav.php");
 
 $id = (int)se($_GET, "id", 0, false);
 $game = [];
@@ -25,38 +25,18 @@ if ($id > 0) {
         // redirect or handle accordingly
     }
 }
-$back = "admin/game_list.php";
+
+$back = "browse.php";
+
 if (isset($_POST["search"])) {
     $searchedId = (int)$_POST["searchedId"];
     // Redirect to the same page with the specified game ID
-    redirect(get_url("admin/game_viewer.php?id=$searchedId"));
+    redirect(get_url("game_view.php?id=$searchedId"));
 }
-if (isset($_POST["delete"])) {
-    // Perform the delete operation
-    $url = "admin/game_list.php"; // Default redirect URL
 
-    if ($id > 0) {
-        // Proceed with delete
-        $query = "DELETE FROM Games WHERE id = :id";
-        $stmt = $db->prepare($query);
-
-        try {
-            $stmt->execute([":id" => $id]);
-            flash("Game deleted successfully", "success");
-        } catch (PDOException $e) {
-            flash("Error deleting game", "danger");
-            error_log("Error deleting game: " . var_export($e, true));
-        }
-    } else {
-        flash("Invalid game ID for deletion", "danger");
-    }
-
-    // Redirect back to the previous URL
-    redirect(get_url($url));
-}
 ?>
 <div class="container-fluid">
-    <h1 class="mb-3">Game Viewer (Update/Delete)</h1>
+    <h1 class="mb-3">Game Viewer (Update)</h1>
     <form method="post" class="mb-3">
         <label for="searchedId">Jump to Game ID:</label>
         <input type="number" id="searchedId" name="searchedId" required min="1">
@@ -78,14 +58,7 @@ if (isset($_POST["delete"])) {
                 <li class="list-group-item"><b>Currency Code:</b> <?php echo se($game, "currencyCode", "", true); ?></li>
             </ul>
             <div class="mt-3">
-                <a href="<?php echo get_url("admin/game_profile.php?id=$id"); ?>" class="btn btn-primary mr-2">Edit</a>
-                <!-- Delete button (Will only be shown for admins; users will have Delete button removed) -->
-
-                    <form method="post" style="display: inline;">
-                        <input type="hidden" name="delete" value="true">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('WARNING: Are you sure you want to delete this game permanently?')">Delete</button>
-                    </form>
-
+                <a href="<?php echo get_url("game_edit.php?id=$id"); ?>" class="btn btn-primary mr-2">Edit</a>
             </div>
         </div>
         <div class="card-footer text-muted">
@@ -108,5 +81,5 @@ if (isset($_POST["delete"])) {
 </div>
 <?php
 // note we need to go up 1 more directory
-require_once(__DIR__ . "/../../../partials/flash.php");
+require_once(__DIR__ . "/../../partials/flash.php");
 ?>

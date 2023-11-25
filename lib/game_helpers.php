@@ -1,6 +1,6 @@
 <?php
 $VALID_ORDER_COLUMNS = ["title", "publisherName", "releaseDate", "currentPrice", "discountPrice", "id"];
-function get_images_from_api_by_breed($api_breed_id)
+/*function get_images_from_api_by_breed($api_breed_id)
 {
     $data = [
         "has_breeds" => "true", "order" => "RANDOM", "include_breeds" => "true",
@@ -245,7 +245,7 @@ function get_temperaments()
         error_log("Error fetching temperaments from db: " . var_export($e, true));
     }
     return [];
-}
+}*/
 
 function search_games()
 {
@@ -283,7 +283,7 @@ function search_games()
 }
 
 // Note: & tells php to pass by reference so any changes made to $params are reflected outside of the function
-function _build_search_query_old(&$params, $search)
+/*function _build_search_query_old(&$params, $search)
 {
     $query = "SELECT 
             c.id, 
@@ -396,21 +396,21 @@ function _build_search_query_old(&$params, $search)
 
 
     return $query;
-}
+}*/
 function _build_search_query(&$params, $search)
 {
     $query = "SELECT 
             g.id, 
-            g.title, 
-            g.publisherName, 
-            g.description, 
-            g.releaseDate, 
-            g.url, 
-            g.currentPrice, 
-            g.discountPrice, 
-            g.currencyCode,
-            g.created,
-            g.modified
+            TRIM(g.title) AS 'Title', 
+            TRIM(g.publisherName) AS 'Publisher', 
+            g.description AS 'Description', 
+            g.releaseDate AS 'Release Date', 
+            g.url AS 'URL', 
+            g.currentPrice AS 'Current Price', 
+            g.discountPrice AS 'Discount Price', 
+            g.currencyCode AS 'Currency Code',
+            g.created AS 'Created',
+            g.modified AS 'Modified'
             FROM 
             Games AS g
             WHERE 1=1";
@@ -432,7 +432,6 @@ function _build_search_query(&$params, $search)
                     $query .= " AND g.description LIKE :description";
                     break;
                 case 'releaseDate':
-                    // Assuming $value is a valid date, you may need to validate it
                     $params[":releaseDate"] = $value;
                     $query .= " AND g.releaseDate = :releaseDate";
                     break;
@@ -450,7 +449,7 @@ function _build_search_query(&$params, $search)
                     break;
                 case 'currencyCode':
                     $params[":currencyCode"] = $value;
-                    $query .= " AND g.currencyCode = :currencyCode";
+                    $query .= " AND g.currencyCode LIKE :currencyCode";
                     break;
                 case "id":
                     $params[":id"] = $value;
@@ -458,9 +457,6 @@ function _build_search_query(&$params, $search)
                     break;
             }
         }
-    }
-    if (!has_role("Admin")) {
-        $query .= " AND status != 'unavailable'";
     }
     // Order by
     if (isset($search["column"]) && !empty($search["column"]) && isset($search["order"]) && !empty($search["order"])) {

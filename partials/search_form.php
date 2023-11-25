@@ -2,17 +2,16 @@
 // make columns options for order by
 // map order columns
 $cols = array_map(function ($v) {
-    return ["label" => $v, "value" => strtolower($v)];
+    return ["label" => $v, "value" => ($v)];
 }, $VALID_ORDER_COLUMNS); //$VALID_ORDER_COLUMNS is defined in cat_helpers.php
-array_unshift($cols, ["label" => "Any", "value" => ""]);
+array_unshift($cols, ["label" => "(Select a column...)", "value" => ""]);
 
 $orders = ["asc", "desc"];
 $orders = array_map(function ($v) {
-    return ["label" => $v, "value" => strtolower($v)];
+    return ["label" => $v, "value" => ($v)];
 }, $orders);
-array_unshift($orders, ["label" => "Any", "value" => ""]);
+array_unshift($orders, ["label" => "(Order by...)", "value" => ""]);
 ?>
-
 <form method="GET">
     <div class="row">
         <div class="col-auto">

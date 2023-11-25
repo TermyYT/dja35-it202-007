@@ -7,12 +7,12 @@ if (!has_role("Admin")) {
     redirect("home.php");
 }
 
-$games = search_games();
-$table = ["data" => $games, "delete_url" => "admin/delete_game.php", "view_url" => "admin/game_viewer.php", "edit_url" => "admin/game_profile.php"];
+$cats = search_cats();
+$table = ["data" => $cats, "delete_url" => "admin/disable_cat_profile.php", "view_url" => "admin/cat_profile.php", "edit_url" => "admin/cat_profile.php"];
 
 ?>
 <div class="container-fluid">
-    <h1>List Games</h1>
+    <h1>List Cats</h1>
     <div>
         <?php include(__DIR__ . "/../../../partials/search_form.php"); ?>
     </div>

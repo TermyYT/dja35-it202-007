@@ -1,11 +1,5 @@
 <?php
-require(__DIR__ . "/../../../partials/nav.php");
-
-if (!has_role("Admin")) {
-    flash("You don't have permission to view this page", "warning");
-    //die(header("Location: " . get_url("home.php")));
-    redirect("home.php");
-}
+require(__DIR__ . "/../../partials/nav.php");
 
 $id = (int)se($_GET, "id", 0, false);
 $game = [];
@@ -14,7 +8,7 @@ if (count($_POST) > 0) {
     if (isset($_POST["search"])) {
         $searchedId = (int)$_POST["searchedId"];
         // Redirect to the same page with the specified game ID
-        redirect(get_url("admin/game_profile.php?id=$searchedId"));
+        redirect(get_url("game_edit.php?id=$searchedId"));
     } else {
         $game = $_POST;
         if (!dupeTitleCheck($game, $id)) {
@@ -50,7 +44,7 @@ function dupeTitleCheck($game, $id)
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     return ($result !== false);
 }
-$back = "admin/game_list.php";
+$back = "browse.php";
 if ($id > 0) {
     $db = getDB();
 
@@ -64,12 +58,12 @@ if ($id > 0) {
             $game = $result;
         } else {
             flash("There was a problem finding this game", "danger");
-            redirect("admin/game_list.php");
+            redirect("browse.php");
         }
     } catch (PDOException $e) {
         error_log("Error fetching game by id: " . var_export($e, true));
         flash("An error fetching game by id has occured", "danger");
-        redirect("admin/game_list.php");
+        redirect("browse.php");
     }
 }
 ?>
@@ -97,5 +91,5 @@ if ($id > 0) {
 
 <?php
 //note we need to go up 1 more directory
-require_once(__DIR__ . "/../../../partials/flash.php");
+require_once(__DIR__ . "/../../partials/flash.php");
 ?>

@@ -6,6 +6,8 @@ if (session_status() != PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+$_SESSION["previous"] = $_SERVER["REQUEST_URI"];
+
 if (!has_role("Admin")) {
     error_log("Doesn't have permission");
     flash("You don't have permission to view this page", "warning");
@@ -29,10 +31,10 @@ if ($id <= 0) {
 }
 
 if (isset($_SESSION["previous"]) && strpos($_SESSION["previous"], "admin") !== false) {
-    $url = "admin/game_viewer_list.php";
-} /*else {
-        $url = "browse.php";
-    }*/
+    $url = "admin/game_list.php";
+} else {
+    $url = "browse.php";
+}
 
 $url .= "?" . http_build_query($_GET);
 error_log("redirecting to " . var_export($url, true));

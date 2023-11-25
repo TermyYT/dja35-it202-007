@@ -11,3 +11,7 @@ function render_table($data = array())
 {
     include(__DIR__ . "/../partials/table.php");
 }
+function render_user_table($data = array())
+{
+    include(__DIR__ . "/../partials/user_table.php");
+}
