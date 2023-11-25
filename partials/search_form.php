@@ -24,17 +24,21 @@ array_unshift($orders, ["label" => "(Order by...)", "value" => ""]);
             <?php render_input(["type" => "date", "id" => "releaseDate", "name" => "releaseDate", "label" => "Release Date", "value" => se($search, "releaseDate", "", false)]); ?>
         </div>
         <div class="col-auto">
-            <?php render_input(["type" => "number", "id" => "currentPrice", "name" => "currentPrice", "label" => "Current Price", "value" => se($search, "currentPrice", "", false)]); ?>
+            <?php render_input(["type" => "number", "id" => "originalPrice", "name" => "originalPrice", "label" => "Original Price", "value" => se($search, "originalPrice", "", false)]); ?>
         </div>
         <div class="col-auto">
             <?php render_input(["type" => "number", "id" => "discountPrice", "name" => "discountPrice", "label" => "Discount Price", "value" => se($search, "discountPrice", "", false)]); ?>
         </div>
-        <!-- Add other fields as needed -->
         <div class="col-2">
             <?php render_input(["type" => "select", "id" => "column", "name" => "column", "label" => "Columns", "options" => $cols, "value" => se($search, "column", "", false)]); ?>
         </div>
         <div class="col-2">
             <?php render_input(["type" => "select", "id" => "order", "name" => "order", "label" => "Order", "options" => $orders, "value" => se($search, "order", "", false)]); ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-auto">
+            <?php render_input(["type" => "number", "id" => "limit", "name" => "limit", "label" => "Limit", "min" => 1, "max" => 100, "value" => se($search, "limit", "", false)]); ?>
         </div>
     </div>
     <div class="row">

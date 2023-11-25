@@ -1,7 +1,10 @@
 <?php
 //note we need to go up 1 more directory
 require(__DIR__ . "/../../../partials/nav.php");
-
+if (!is_logged_in()) {
+    flash("You must be logged in to view this page", "warning");
+    redirect("login.php");
+}
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
     die(header("Location: " . get_url("home.php")));
@@ -76,7 +79,7 @@ function process_single_game($game, $columns, $mappings)
     $record["releaseDate"] = $dateTime->format("Y-m-d");
 
     $record["url"] = se($game, "url", "", false);
-    $record["currentPrice"] = (int)se($game, "currentPrice", 0, false);
+    $record["originalPrice"] = (int)se($game, "currentPrice", 0, false);
     $record["discountPrice"] = (int)se($game["price"]["totalPrice"], "discountPrice", 0, false);
     $record["currencyCode"] = se($game["price"]["totalPrice"], "currencyCode", "", false);
 
@@ -91,6 +94,13 @@ function process_single_game($game, $columns, $mappings)
             }
         }
     }*/
+    // Decode HTML entities for certain columns
+    $htmlDecodedColumns = ["title", "publisherName", "description", "currencyCode"];
+    foreach ($htmlDecodedColumns as $column) {
+        if (isset($record[$column])) {
+            $record[$column] = htmlspecialchars_decode($record[$column], ENT_QUOTES);
+        }
+    }
     error_log("Record: " . var_export($record, true));
     return $record;
 }
@@ -152,7 +162,8 @@ function process_games($result, $searchTerm = null)
 }
 function process_search($searchTerm)
 {
-    $result = get("https://epic-store-games.p.rapidapi.com/onSale", "GAME_API_KEY", ["searchWords" => $searchTerm, "limit" => 75, "page" => 0], true);
+    $encodedSearchTerm = urlencode($searchTerm);
+    $result = get("https://epic-store-games.p.rapidapi.com/onSale", "GAME_API_KEY", ["searchWords" => $encodedSearchTerm, "limit" => 75, "page" => 0], true);
     process_games($result, $searchTerm);
 }
 $action = se($_POST, "action", "", false);
@@ -168,17 +179,6 @@ if ($action) {
             break;
     }
 }
-/* Placing this here because HTML commenting is being uncooperative.
-    <div class="row">
-        <div class="col">
-            <!-- Game refresh button -->
-            <form method="POST">
-                <input type="hidden" name="action" value="games" />
-                <input type="submit" class="btn btn-primary" value="Refresh Games" />
-            </form>
-        </div>
-    </div>
-*/
 ?>
 <div class="container-fluid">
     <h1>Game Database Management</h1>

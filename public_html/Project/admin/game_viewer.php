@@ -1,13 +1,23 @@
 <?php
 require(__DIR__ . "/../../../partials/nav.php");
 
+if (!is_logged_in()) {
+    flash("You must be logged in to view this page", "warning");
+    redirect("login.php");
+}
+
+if (!has_role("Admin")) {
+    flash("You don't have permission to view this page", "warning");
+    redirect("home.php");
+}
+
 $id = (int)se($_GET, "id", 0, false);
 $game = [];
 
 if ($id > 0) {
     $db = getDB();
 
-    $query = "SELECT title, publisherName, description, releaseDate, url, currentPrice, discountPrice, currencyCode, modified FROM Games WHERE id = :id";
+    $query = "SELECT title, publisherName, description, releaseDate, url, originalPrice, discountPrice, currencyCode, modified FROM Games WHERE id = :id";
     $stmt = $db->prepare($query);
 
     try {
@@ -17,12 +27,12 @@ if ($id > 0) {
             $game = $result;
         } else {
             flash("There was a problem finding this game", "danger");
-            // redirect or handle accordingly
+            redirect("admin/game_list.php");
         }
     } catch (PDOException $e) {
         error_log("Error fetching game by id: " . var_export($e, true));
         flash("An unhandled error occurred", "danger");
-        // redirect or handle accordingly
+        redirect("admin/game_list.php");
     }
 }
 $back = "admin/game_list.php";
@@ -31,10 +41,8 @@ if (isset($_POST["search"])) {
     // Redirect to the same page with the specified game ID
     redirect(get_url("admin/game_viewer.php?id=$searchedId"));
 }
+// Perform the delete operation
 if (isset($_POST["delete"])) {
-    // Perform the delete operation
-    $url = "admin/game_list.php"; // Default redirect URL
-
     if ($id > 0) {
         // Proceed with delete
         $query = "DELETE FROM Games WHERE id = :id";
@@ -52,7 +60,7 @@ if (isset($_POST["delete"])) {
     }
 
     // Redirect back to the previous URL
-    redirect(get_url($url));
+    redirect("admin/game_list.php");
 }
 ?>
 <div class="container-fluid">
@@ -62,7 +70,7 @@ if (isset($_POST["delete"])) {
         <input type="number" id="searchedId" name="searchedId" required min="1">
         <button type="submit" class="btn btn-primary" name="search">Search</button>
     </form>
-    <a class="btn btn-secondary mb-3" href="<?php get_url($back, true); ?>">Back</a>
+    <a class="btn btn-secondary mb-3" href="<?php get_url($back, true); ?>">Back to List</a>
     <div class="card text-center mb-3">
         <h1 class="card-header">
             <?php echo se($game, "title", "", true); ?>
@@ -73,8 +81,8 @@ if (isset($_POST["delete"])) {
                 <li class="list-group-item"><b>Publisher:</b> <?php echo se($game, "publisherName", "", true); ?></li>
                 <li class="list-group-item"><b>Release Date:</b> <?php echo se($game, "releaseDate", "", true); ?></li>
                 <li class="list-group-item"><b>URL:</b> <?php echo se($game, "url", "", true); ?></li>
-                <li class="list-group-item"><b>Current Price:</b> <?php echo se($game, "currentPrice", "", true); ?></li>
-                <li class="list-group-item"><b>Discount Price:</b> <?php echo se($game, "discountPrice", "", true); ?></li>
+                <li class="list-group-item"><b>Original Price:</b> <?php echo "$" . format_price(se($game, "originalPrice", "", false)); ?></li>
+                <li class="list-group-item"><b>Discount Price:</b> <?php echo "$" . format_price(se($game, "discountPrice", "", false)); ?></li>
                 <li class="list-group-item"><b>Currency Code:</b> <?php echo se($game, "currencyCode", "", true); ?></li>
             </ul>
             <div class="mt-3">

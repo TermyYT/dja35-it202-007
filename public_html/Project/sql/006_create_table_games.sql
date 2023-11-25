@@ -1,5 +1,5 @@
 CREATE TABLE Games (
-    check(currentPrice >= 0),
+    check(originalPrice >= 0),
     check(discountPrice >= 0),
     `id` INT AUTO_INCREMENT NOT NULL,
     `api_id` VARCHAR(255) DEFAULT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE Games (
     `description` TEXT,
     `releaseDate` DATE,
     `url` VARCHAR(255),
-    `currentPrice` INT,
+    `originalPrice` INT,
     `discountPrice` INT,
     `currencyCode` VARCHAR(3),
     `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

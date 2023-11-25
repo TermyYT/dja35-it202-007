@@ -1,5 +1,5 @@
 <?php
-$VALID_ORDER_COLUMNS = ["title", "publisherName", "releaseDate", "currentPrice", "discountPrice", "id"];
+$VALID_ORDER_COLUMNS = ["title", "publisherName", "releaseDate", "originalPrice", "discountPrice", "id"];
 /*function get_images_from_api_by_breed($api_breed_id)
 {
     $data = [
@@ -272,16 +272,30 @@ function search_games()
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($result) {
+            // Format prices before returning
+            foreach ($result as $game) {
+                $game['Original Price'] = format_price($game['Original Price']);
+                $game['Discount Price'] = format_price($game['Discount Price']);
+            }
+            unset($game); // Unset reference to the last element
             $games = $result;
         }
     } catch (PDOException $e) {
         flash("An error occurred while searching for games: " . $e->getMessage(), "warning");
         error_log("Game Search Error: " . var_export($e, true));
     }
-
     return $games;
 }
-
+// Convert cents to dollars and format as currency
+function format_price($price) {
+    if (is_numeric($price)) {
+        // Convert the price to a formatted string
+        return number_format($price / 100, 2);
+    } else {
+        // Handle non-numeric or empty values
+        return 'xx.xx';
+    }
+}
 // Note: & tells php to pass by reference so any changes made to $params are reflected outside of the function
 /*function _build_search_query_old(&$params, $search)
 {
@@ -406,7 +420,7 @@ function _build_search_query(&$params, $search)
             g.description AS 'Description', 
             g.releaseDate AS 'Release Date', 
             g.url AS 'URL', 
-            g.currentPrice AS 'Current Price', 
+            g.originalPrice AS 'Original Price',
             g.discountPrice AS 'Discount Price', 
             g.currencyCode AS 'Currency Code',
             g.created AS 'Created',
@@ -420,11 +434,11 @@ function _build_search_query(&$params, $search)
         if ($value == 0 || !empty($value)) {
             switch ($key) {
                 case 'title':
-                    $params[":title"] = $value;
+                    $params[":title"] = "%$value%";
                     $query .= " AND g.title LIKE :title";
                     break;
                 case 'publisherName':
-                    $params[":publisherName"] = $value;
+                    $params[":publisherName"] = "%$value%";
                     $query .= " AND g.publisherName LIKE :publisherName";
                     break;
                 case 'description':
@@ -439,9 +453,9 @@ function _build_search_query(&$params, $search)
                     $params[":url"] = $value;
                     $query .= " AND g.url LIKE :url";
                     break;
-                case 'currentPrice':
-                    $params[":currentPrice"] = $value;
-                    $query .= " AND g.currentPrice = :currentPrice";
+                case 'originalPrice':
+                    $params[":originalPrice"] = $value;
+                    $query .= " AND g.originalPrice = :originalPrice";
                     break;
                 case 'discountPrice':
                     $params[":discountPrice"] = $value;
@@ -476,10 +490,17 @@ function _build_search_query(&$params, $search)
         }
         $query .= " ORDER BY $col $order"; //<-- be absolutely sure you trust these values; we can't bind certain parts of the query due to how the parameter mapping works
     }
-
-    // Limit last
-    $query .= " LIMIT 10";
-
+    
+    // Limit condition
+    if (isset($search["limit"]) && !empty($search["limit"])) {
+        $limit = (int)$search["limit"];
+        $limit = max(1, min(100, $limit)); // Ensure the limit is between 1 and 100
+        $query .= " LIMIT $limit";
+    } else {
+        // Use the default limit of 10
+        $query .= " LIMIT 10";
+    }
+    
     return $query;
 }
 /**
@@ -505,7 +526,7 @@ function validate_game($game) {
     $description = se($game, "description", "", false);
     $releaseDate = se($game, "releaseDate", "", false);
     $url = se($game, "url", "", false);
-    $currentPrice = (int)se($game, "currentPrice", -1, false);
+    $originalPrice = (int)se($game, "originalPrice", -1, false);
     $discountPrice = (int)se($game, "discountPrice", -1, false);
     $currencyCode = se($game, "currencyCode", "", false);
 
@@ -536,12 +557,12 @@ function validate_game($game) {
         flash("URL must start with 'https://store.epicgames.com/'", "warning");
         $has_error = true;
     }
-    // Current Price
-    if ($currentPrice == -1) {
-        flash("Current Price must be entered", "warning");
+    // Original Price
+    if ($originalPrice == -1) {
+        flash("Original Price must be entered", "warning");
         $has_error = true;
-    } else if ($currentPrice < 0) {
-        flash("Current Price must be a non-negative value", "warning");
+    } else if ($originalPrice < 0) {
+        flash("Original Price must be a non-negative value", "warning");
         $has_error = true;
     }
     // Discount Price

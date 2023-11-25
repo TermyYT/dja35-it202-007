@@ -3,14 +3,18 @@
 require(__DIR__ . "/../../partials/nav.php");
 
 $search = $_GET;
-
-/* No admin check needed for user side.
-if (!has_role("Admin")) {
-    flash("You don't have permission to view this page", "warning");
-    redirect("home.php");
-}*/
+if (!is_logged_in()) {
+    flash("You must be logged in to view this page", "warning");
+    redirect("login.php");
+}
 
 $games = search_games();
+// Format prices before rendering the table
+foreach ($games as &$game) {
+    $game['Original Price'] = format_price($game['Original Price']);
+    $game['Discount Price'] = format_price($game['Discount Price']);
+}
+unset($game); // Unset reference to the last element
 $table = ["data" => $games, "view_url" => "game_view.php", "edit_url" => "game_edit.php"];
 ?>
 

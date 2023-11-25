@@ -8,8 +8,12 @@ if (session_status() != PHP_SESSION_ACTIVE) {
 
 $_SESSION["previous"] = $_SERVER["REQUEST_URI"];
 
+if (!is_logged_in()) {
+    flash("You must be logged in to view this page", "warning");
+    redirect("login.php");
+}
+
 if (!has_role("Admin")) {
-    error_log("Doesn't have permission");
     flash("You don't have permission to view this page", "warning");
     redirect("home.php");
 }
