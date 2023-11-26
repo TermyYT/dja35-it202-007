@@ -29,4 +29,12 @@ require(__DIR__ . "/render_functions.php");
 require(__DIR__ . "/load_api_keys.php");
 //API Helper
 require(__DIR__ . "/api_helper.php");
+//Game Helper
+require(__DIR__ . "/game_helpers.php");
+//Update Data
+require(__DIR__ . "/update_data.php");
+//Save Data
+require(__DIR__ . "/save_data.php");
+//Redirect
+require(__DIR__ . "/redirect.php")
 ?>

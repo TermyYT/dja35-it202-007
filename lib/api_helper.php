@@ -81,6 +81,11 @@ function _sendRequest($url, $key, $data = [], $method = 'GET', $isRapidAPI = tru
  */
 function get($url, $key, $data = [], $isRapidAPI = true, $rapidAPIHost = "")
 {
+    // If it's a search request, include the 'searchWords' parameter
+    if (isset($data['query'])) {
+        $data['searchWords'] = $data['query'];
+        unset($data['query']);
+    }
     return _sendRequest($url, $key, $data, 'GET', $isRapidAPI, $rapidAPIHost);
 }
 
@@ -99,4 +104,13 @@ function get($url, $key, $data = [], $isRapidAPI = true, $rapidAPIHost = "")
 function post($url, $key, $data = [], $isRapidAPI = true,  $rapidAPIHost = "")
 {
     return _sendRequest($url, $key, $data, 'POST', $isRapidAPI, $rapidAPIHost);
+}
+
+// Helper function to get a game by api_id
+function getGameByApiId($db, $apiId)
+{
+    $stmt = $db->prepare("SELECT * FROM Games WHERE api_id = :api_id LIMIT 1");
+    $stmt->bindValue(":api_id", $apiId);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }

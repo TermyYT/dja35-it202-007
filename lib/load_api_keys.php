@@ -1,5 +1,5 @@
 <?php 
-$env_keys = ["CAT_API_KEY"]; //Edit API Key name
+$env_keys = ["GAME_API_KEY"]; //Edit API Key name
 $ini = @parse_ini_file(".env");
 
 $API_KEYS = [];
@@ -15,7 +15,7 @@ foreach($env_keys as $key){
         $API_KEYS[$key] = $API_KEY;
     }
     if(!isset( $API_KEYS[$key]) || ! $API_KEYS[$key]){
-        error_log("Faild to load api key for env key $key");
+        error_log("Failed to load api key for env key $key");
     }
     unset($API_KEY);
 }
