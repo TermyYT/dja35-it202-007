@@ -1,12 +1,12 @@
 <?php
 require(__DIR__ . "/../../../lib/functions.php");
-$id = (int)se($_GET, "id", 0, false);
+$id = (int)se($_GET, "id", 0, false); // Used to acquire the id value for the record.
 
-if (session_status() != PHP_SESSION_ACTIVE) {
+if (session_status() != PHP_SESSION_ACTIVE) { // If the PHP session isn't active, then start it.
     session_start();
 }
 
-$_SESSION["previous"] = $_SERVER["REQUEST_URI"];
+$_SESSION["previous"] = $_SERVER["REQUEST_URI"]; // Setting a value for the "previous" session.
 
 if (!is_logged_in()) {
     flash("You must be logged in to view this page", "warning");
@@ -19,7 +19,7 @@ if (!has_role("Admin")) {
 }
 
 if ($id <= 0) {
-    flash("Invalid game ID", "danger");
+    flash("Invalid game ID", "danger"); // A check for an invalid game ID being passed.
 } else {
     $db = getDB();
     $query = "DELETE FROM Games WHERE id = :id";
@@ -34,12 +34,12 @@ if ($id <= 0) {
     }
 }
 
-if (isset($_SESSION["previous"]) && strpos($_SESSION["previous"], "admin") !== false) {
-    $url = "admin/game_list.php";
+if (isset($_SESSION["previous"]) && strpos($_SESSION["previous"], "admin") !== false) { // Decides return point for user after deletion.
+    $url = "admin/game_list.php"; // ADMIN game list.
 } else {
-    $url = "browse.php";
+    $url = "browse.php"; // USER game list.
 }
 
 $url .= "?" . http_build_query($_GET);
-error_log("redirecting to " . var_export($url, true));
-redirect(get_url($url));
+error_log("Redirecting to " . var_export($url, true));
+redirect(get_url($url)); // Redirects user to chosen page.
