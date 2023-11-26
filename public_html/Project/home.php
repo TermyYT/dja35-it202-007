@@ -2,7 +2,10 @@
 require(__DIR__ . "/../../partials/nav.php");
 ?>
 <?php
-
+if (!is_logged_in()) {
+    flash("You must be logged in to view this page", "warning");
+    redirect("login.php");
+}
 if (is_logged_in(true)) {
     //echo "Welcome home, " . get_username();
     //comment this out if you don't want to see the session variables
@@ -10,7 +13,7 @@ if (is_logged_in(true)) {
 }
 ?>
 <div class="container-fluid">
-    <div class="h-50 p-5 text-bg-dark rounded-3">
+    <div class="h-30 p-5 text-bg-dark rounded-3">
         <h1>Welcome to the Epic Games Wishlister!</h1>
         <p>Do you want to have a personal wishlist for games sold on Epic Games?</p>
         <p>Do you want up-to-date information on sales going on?</p>

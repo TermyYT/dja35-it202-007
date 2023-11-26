@@ -33,23 +33,29 @@ session_start();
 <script src="<?php echo get_url('helpers.js'); ?>"></script>
 <nav>
     <ul>
-        <?php if (is_logged_in()) : ?>
+        <?php if (is_logged_in()) : ?> <!-- If logged in. -->
             <li><a href="<?php echo get_url('home.php'); ?>">Home</a></li>
-            <li><a href="<?php echo get_url('profile.php'); ?>">Profile</a></li>
+            <li><a href="<?php echo get_url('profile.php'); ?>">User Profile</a></li>
         <?php endif; ?>
-        <?php if (!is_logged_in()) : ?>
+        <?php if (is_logged_in() && !has_role("Admin")) : ?> <!-- If logged in and doesn't have Admin role. -->
+            <li><a href="<?php echo get_url('game_edit.php'); ?>">Game Editor</a></li>
+            <li><a href="<?php echo get_url('game_view.php'); ?>">Game View</a></li>
+            <li><a href="<?php echo get_url('browse.php'); ?>">Game List</a></li>
+        <?php endif; ?>
+        <?php if (!is_logged_in()) : ?> <!-- If not logged in. -->
             <li><a href="<?php echo get_url('login.php'); ?>">Login</a></li>
             <li><a href="<?php echo get_url('register.php'); ?>">Register</a></li>
         <?php endif; ?>
-        <?php if (has_role("Admin")) : ?>
+        <?php if (is_logged_in() && has_role("Admin")) : ?> <!-- If logged in and has Admin role. -->
             <li><a href="<?php echo get_url('admin/create_role.php'); ?>">Create Role</a></li>
             <li><a href="<?php echo get_url('admin/list_roles.php'); ?>">List Roles</a></li>
             <li><a href="<?php echo get_url('admin/assign_roles.php'); ?>">Assign Roles</a></li>
             <li><a href="<?php echo get_url('admin/manage_game_data.php'); ?>">Manage Data</a></li>
             <li><a href="<?php echo get_url('admin/game_profile.php'); ?>">Game Profile</a></li>
             <li><a href="<?php echo get_url('admin/game_viewer.php'); ?>">Game Viewer</a></li>
+            <li><a href="<?php echo get_url('admin/game_list.php'); ?>">Game List</a></li>
         <?php endif; ?>
-        <?php if (is_logged_in()) : ?>
+        <?php if (is_logged_in()) : ?> <!-- If logged in. -->
             <li><a href="<?php echo get_url('logout.php'); ?>">Logout</a></li>
         <?php endif; ?>
     </ul>

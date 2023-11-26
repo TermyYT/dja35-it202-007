@@ -1,5 +1,6 @@
 <?php if (isset($data)) : ?>
     <?php
+    // Is used with render_input() on nearly any page that has a form.
     //setup some variables for readability
     $_include_margin = (bool)se($data, "include_margin", true, false);
     $_label = se($data, "label", "", false);

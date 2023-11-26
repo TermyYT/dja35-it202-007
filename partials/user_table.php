@@ -1,6 +1,6 @@
 <?php if (isset($data)) : ?>
     <?php
-    // This is the table for ADMIN users.
+    // This is the table for REGULAR users.
     //setup some variables for readability
     $_extra_classes = se($data, "extra_classes", "", false);
     $_title = se($data, "title", "", false);
@@ -74,9 +74,6 @@
                                 <?php endif; ?>
                                 <?php if ($_edit_url) : ?>
                                     <a href="<?php get_url($_edit_url, true); ?>?<?php se($_primary_key_column); ?>=<?php se($row, $_primary_key_column); ?>&<?php se($query_string); ?>" class="<?php se($_edit_classes); ?>"><?php se($_edit_label); ?></a>
-                                <?php endif; ?>
-                                <?php if ($_delete_url) : ?>
-                                    <a href="<?php get_url($_delete_url, true); ?>?<?php se($_primary_key_column); ?>=<?php se($row, $_primary_key_column); ?>&<?php se($query_string); ?>" class="<?php se($_delete_classes); ?>"><?php se($_delete_label); ?></a>
                                 <?php endif; ?>
                                 <?php if ($_post_self_form) : ?>
                                     <!-- TODO refactor -->
