@@ -1,21 +1,21 @@
-CREATE TABLE Games (
-    check(originalPrice >= 0),
-    check(discountPrice >= 0),
-    `id` INT AUTO_INCREMENT NOT NULL,
-    `api_id` VARCHAR(255) DEFAULT NULL,
-    `title` VARCHAR(255),
-    `publisherName` VARCHAR(255) DEFAULT NULL,
-    `description` TEXT,
-    `releaseDate` DATE,
-    `url` VARCHAR(255),
-    `originalPrice` INT,
-    `discountPrice` INT,
-    `currencyCode` VARCHAR(3),
-    `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `modified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY (`api_id`),
-    UNIQUE KEY (`title`)
+CREATE TABLE Games ( -- Table for storing all games and their info.
+    check(originalPrice >= 0), -- Checks if originalPrice value is 0 or greater. 0 = free.
+    check(discountPrice >= 0), -- Checks if discountPrice value is 0 or greater. 0 = free.
+    `id` INT AUTO_INCREMENT NOT NULL, -- id is auto-incremented and cannot be NULL.
+    `api_id` VARCHAR(255) DEFAULT NULL, -- api_id is only set when API data is pulled.
+    `title` VARCHAR(255), -- The game's title.
+    `publisherName` VARCHAR(255) DEFAULT NULL, -- The game's publisher. Not all API pulls acquire publisher names, so default is NULL.
+    `description` TEXT, -- The game's description.
+    `releaseDate` DATE, -- The game's release date on Epic Games.
+    `url` VARCHAR(255), -- The game's URL.
+    `originalPrice` INT, -- The game's original/base price. Acquires "currentPrice" field from the API.
+    `discountPrice` INT, -- The game's current, discounted price. Acquires "discountPrice" field from the API.
+    `currencyCode` VARCHAR(3), -- The game's 3-letter currency code. (e.g. - "USD")
+    `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- The creation time for the record.
+    `modified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- The update time for the record.
+    PRIMARY KEY (`id`), -- The record ID is the primary key.
+    UNIQUE KEY (`api_id`), -- All API IDs must be unique.
+    UNIQUE KEY (`title`) -- All game titles must be unique.
 );
 /*CREATE TABLE CA_Breeds(
     `id`         int auto_increment not null,
