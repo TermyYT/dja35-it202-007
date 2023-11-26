@@ -1,5 +1,6 @@
 <?php
 require(__DIR__ . "/../../../lib/functions.php");
+// DJA35 - 11/27/2023 - The delete page takes an ID and uses it to identify and delete a record from the db.
 $id = (int)se($_GET, "id", 0, false); // Used to acquire the id value for the record.
 
 if (session_status() != PHP_SESSION_ACTIVE) { // If the PHP session isn't active, then start it.
@@ -8,21 +9,22 @@ if (session_status() != PHP_SESSION_ACTIVE) { // If the PHP session isn't active
 
 $_SESSION["previous"] = $_SERVER["REQUEST_URI"]; // Setting a value for the "previous" session.
 
-if (!is_logged_in()) {
+if (!is_logged_in()) { // Must be logged in.
     flash("You must be logged in to view this page", "warning");
     redirect("login.php");
 }
 
-if (!has_role("Admin")) {
+if (!has_role("Admin")) { // Must have the admin role.
     flash("You don't have permission to view this page", "warning");
     redirect("home.php");
 }
 
-if ($id <= 0) {
-    flash("Invalid game ID", "danger"); // A check for an invalid game ID being passed.
+if ($id <= 0) { // A check for an invalid game ID being passed.
+    flash("Invalid game ID", "danger");
+    redirect("admin/game_list.php"); 
 } else {
     $db = getDB();
-    $query = "DELETE FROM Games WHERE id = :id";
+    $query = "DELETE FROM Games WHERE id = :id"; // The query for deleting the record.
     $stmt = $db->prepare($query);
 
     try {
