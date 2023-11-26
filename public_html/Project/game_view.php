@@ -6,12 +6,12 @@ if (!is_logged_in()) {
     redirect("login.php");
 }
 
-$id = (int)se($_GET, "id", 0, false);
+$id = (int)se($_GET, "id", 0, false); // Used to acquire the id value for the record.
 $game = [];
 
 if ($id > 0) {
     $db = getDB();
-
+    // For acquiring specific records. 
     $query = "SELECT title, publisherName, description, releaseDate, url, originalPrice, discountPrice, currencyCode, modified FROM Games WHERE id = :id";
     $stmt = $db->prepare($query);
 
@@ -31,12 +31,11 @@ if ($id > 0) {
     }
 }
 
-$back = "browse.php";
+$back = "browse.php"; // Set for the Back button.
 
-if (isset($_POST["search"])) {
+if (isset($_POST["search"])) { // If there's a search happening...
     $searchedId = (int)$_POST["searchedId"];
-    // Redirect to the same page with the specified game ID
-    redirect(get_url("game_view.php?id=$searchedId"));
+    redirect(get_url("game_view.php?id=$searchedId")); // Redirect to the same page with the specified game ID.
 }
 
 ?>
@@ -58,8 +57,8 @@ if (isset($_POST["search"])) {
                 <li class="list-group-item"><b>Publisher:</b> <?php echo se($game, "publisherName", "", true); ?></li>
                 <li class="list-group-item"><b>Release Date:</b> <?php echo se($game, "releaseDate", "", true); ?></li>
                 <li class="list-group-item"><b>URL:</b> <?php echo se($game, "url", "", true); ?></li>
-                <li class="list-group-item"><b>Original Price:</b> <?php echo "$" . format_price(se($game, "originalPrice", "", false)); ?></li>
-                <li class="list-group-item"><b>Discount Price:</b> <?php echo "$" . format_price(se($game, "discountPrice", "", false)); ?></li>
+                <li class="list-group-item"><b>Original Price:</b> <?php echo "$" . format_price(se($game, "originalPrice", "", false)); ?></li> <!-- Appended a $ and formatted the price. -->
+                <li class="list-group-item"><b>Discount Price:</b> <?php echo "$" . format_price(se($game, "discountPrice", "", false)); ?></li> <!-- Appended a $ and formatted the price. -->
                 <li class="list-group-item"><b>Currency Code:</b> <?php echo se($game, "currencyCode", "", true); ?></li>
             </ul>
             <div class="mt-3">
