@@ -19,9 +19,11 @@ array_unshift($orders, ["label" => "(Order by...)", "value" => ""]);
         <div class="col-auto">
             <?php render_input(["type" => "text", "id" => "title", "name" => "title", "label" => "Title", "value" => se($search, "title", "", false)]); ?>
         </div>
+        <!--
         <div class="col-auto">
-            <?php render_input(["type" => "text", "id" => "publisherName", "name" => "publisherName", "label" => "Publisher", "value" => se($search, "publisherName", "", false)]); ?>
+            <?php /*render_input(["type" => "text", "id" => "publisherName", "name" => "publisherName", "label" => "Publisher", "value" => se($search, "publisherName", "", false)]);*/ ?>
         </div>
+        -->
         <div class="col-auto">
             <?php render_input(["type" => "date", "id" => "releaseDate", "name" => "releaseDate", "label" => "Release Date", "value" => se($search, "releaseDate", "", false)]); ?>
         </div>
@@ -37,8 +39,6 @@ array_unshift($orders, ["label" => "(Order by...)", "value" => ""]);
         <div class="col-2">
             <?php render_input(["type" => "select", "id" => "order", "name" => "order", "label" => "Order", "options" => $orders, "value" => se($search, "order", "", false)]); ?>
         </div>
-    </div>
-    <div class="row"> <!-- Moved Limit field one row down to address layout interference. -->
         <div class="col-auto">
             <?php render_input(["type" => "number", "id" => "limit", "name" => "limit", "label" => "Record Limit (1-100)", "min" => 1, "max" => 100, "value" => se($search, "limit", "", false)]); ?>
         </div>

@@ -1,6 +1,6 @@
 <?php
 // The columns to order the table by.
-$VALID_ORDER_COLUMNS = ["title", "publisherName", "releaseDate", "originalPrice", "discountPrice", "id"];
+$VALID_ORDER_COLUMNS = ["title", "releaseDate", "originalPrice", "discountPrice", "id"];
 function search_games()
 {
     // Initialize variables
