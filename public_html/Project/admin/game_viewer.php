@@ -11,12 +11,12 @@ if (!has_role("Admin")) {
     redirect("home.php");
 }
 
-$id = (int)se($_GET, "id", 0, false);
+$id = (int)se($_GET, "id", 0, false); // Used to acquire the id value for the record.
 $game = [];
 
 if ($id > 0) {
     $db = getDB();
-
+    // For acquiring specific records. 
     $query = "SELECT title, publisherName, description, releaseDate, url, originalPrice, discountPrice, currencyCode, modified FROM Games WHERE id = :id";
     $stmt = $db->prepare($query);
 
@@ -35,13 +35,12 @@ if ($id > 0) {
         redirect("admin/game_list.php");
     }
 }
-$back = "admin/game_list.php";
-if (isset($_POST["search"])) {
+$back = "admin/game_list.php"; // Set for the Back button.
+if (isset($_POST["search"])) { // If there's a search happening...
     $searchedId = (int)$_POST["searchedId"];
-    // Redirect to the same page with the specified game ID
-    redirect(get_url("admin/game_viewer.php?id=$searchedId"));
+    redirect(get_url("admin/game_viewer.php?id=$searchedId")); // Redirect to the same page with the specified game ID.
 }
-// Perform the delete operation
+// Perform the delete operation; only available in ADMIN view.
 if (isset($_POST["delete"])) {
     if ($id > 0) {
         // Proceed with delete
@@ -59,7 +58,7 @@ if (isset($_POST["delete"])) {
         flash("Invalid game ID for deletion", "danger");
     }
 
-    // Redirect back to the previous URL
+    // Redirect back to the game list.
     redirect("admin/game_list.php");
 }
 ?>
@@ -81,19 +80,17 @@ if (isset($_POST["delete"])) {
                 <li class="list-group-item"><b>Publisher:</b> <?php echo se($game, "publisherName", "", true); ?></li>
                 <li class="list-group-item"><b>Release Date:</b> <?php echo se($game, "releaseDate", "", true); ?></li>
                 <li class="list-group-item"><b>URL:</b> <?php echo se($game, "url", "", true); ?></li>
-                <li class="list-group-item"><b>Original Price:</b> <?php echo "$" . format_price(se($game, "originalPrice", "", false)); ?></li>
-                <li class="list-group-item"><b>Discount Price:</b> <?php echo "$" . format_price(se($game, "discountPrice", "", false)); ?></li>
+                <li class="list-group-item"><b>Original Price:</b> <?php echo "$" . format_price(se($game, "originalPrice", "", false)); ?></li> <!-- Appended a $ and formatted the price. -->
+                <li class="list-group-item"><b>Discount Price:</b> <?php echo "$" . format_price(se($game, "discountPrice", "", false)); ?></li> <!-- Appended a $ and formatted the price. -->
                 <li class="list-group-item"><b>Currency Code:</b> <?php echo se($game, "currencyCode", "", true); ?></li>
             </ul>
             <div class="mt-3">
                 <a href="<?php echo get_url("admin/game_profile.php?id=$id"); ?>" class="btn btn-primary mr-2">Edit</a>
                 <!-- Delete button (Will only be shown for admins; users will have Delete button removed) -->
-
                     <form method="post" style="display: inline;">
                         <input type="hidden" name="delete" value="true">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('WARNING: Are you sure you want to delete this game permanently?')">Delete</button>
                     </form>
-
             </div>
         </div>
         <div class="card-footer text-muted">
