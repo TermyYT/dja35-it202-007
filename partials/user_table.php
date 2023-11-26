@@ -1,5 +1,6 @@
 <?php if (isset($data)) : ?>
     <?php
+    // This is the table for REGULAR users.
     //setup some variables for readability
     $_extra_classes = se($data, "extra_classes", "", false);
     $_title = se($data, "title", "", false);

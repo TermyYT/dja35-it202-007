@@ -1,9 +1,11 @@
 <?php
+// This page is for defining the search form used with game_view.php and browse.php.
+
 // make columns options for order by
 // map order columns
 $cols = array_map(function ($v) {
     return ["label" => $v, "value" => ($v)];
-}, $VALID_ORDER_COLUMNS); //$VALID_ORDER_COLUMNS is defined in cat_helpers.php
+}, $VALID_ORDER_COLUMNS); // $VALID_ORDER_COLUMNS is defined in game_helpers.php.
 array_unshift($cols, ["label" => "(Select a column...)", "value" => ""]);
 
 $orders = ["asc", "desc"];
@@ -36,9 +38,9 @@ array_unshift($orders, ["label" => "(Order by...)", "value" => ""]);
             <?php render_input(["type" => "select", "id" => "order", "name" => "order", "label" => "Order", "options" => $orders, "value" => se($search, "order", "", false)]); ?>
         </div>
     </div>
-    <div class="row">
+    <div class="row"> <!-- Moved Limit field one row down to address layout interference. -->
         <div class="col-auto">
-            <?php render_input(["type" => "number", "id" => "limit", "name" => "limit", "label" => "Limit", "min" => 1, "max" => 100, "value" => se($search, "limit", "", false)]); ?>
+            <?php render_input(["type" => "number", "id" => "limit", "name" => "limit", "label" => "Record Limit (1-100)", "min" => 1, "max" => 100, "value" => se($search, "limit", "", false)]); ?>
         </div>
     </div>
     <div class="row">
