@@ -17,7 +17,7 @@ $game = [];
 if ($id > 0) {
     $db = getDB();
     // For acquiring specific records. 
-    $query = "SELECT title, publisherName, description, releaseDate, url, originalPrice, discountPrice, currencyCode, modified FROM Games WHERE id = :id";
+    $query = "SELECT title, publisherName, description, releaseDate, url, originalPrice, discountPrice, currencyCode, created, modified FROM Games WHERE id = :id";
     $stmt = $db->prepare($query);
 
     try {
@@ -96,6 +96,12 @@ if (isset($_POST["delete"])) {
         <div class="card-footer text-muted">
         <?php // Formats modification date for each record's card.
         try {
+            if (isset($game['created'])) {
+                $createdDate = new DateTime($game['created']);
+                echo "Created: " . $createdDate->format('Y-m-d H:i:s') . " | ";
+            } else {
+                throw new Exception("Creation date not available.");
+            }
             if (isset($game['modified'])) {
                 $modifiedDate = new DateTime($game['modified']);
                 echo "Last modified: " . $modifiedDate->format('Y-m-d H:i:s');
@@ -104,12 +110,11 @@ if (isset($_POST["delete"])) {
             }
         }
         catch (Exception $e) {
-            error_log("Error fetching modification date: " . var_export($e, true));
+            error_log("Error fetching date: " . var_export($e, true));
         }
         ?>
         </div>
     </div>
-    
 </div>
 <?php
 // note we need to go up 1 more directory

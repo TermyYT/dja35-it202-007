@@ -12,7 +12,7 @@ $game = [];
 if ($id > 0) {
     $db = getDB();
     // For acquiring specific records. 
-    $query = "SELECT title, publisherName, description, releaseDate, url, originalPrice, discountPrice, currencyCode, modified FROM Games WHERE id = :id";
+    $query = "SELECT title, publisherName, description, releaseDate, url, originalPrice, discountPrice, currencyCode, created, modified FROM Games WHERE id = :id";
     $stmt = $db->prepare($query);
 
     try {
@@ -68,6 +68,12 @@ if (isset($_POST["search"])) { // If there's a search happening...
         <div class="card-footer text-muted">
         <?php // Formats modification date for each record's card.
         try {
+            if (isset($game['created'])) {
+                $createdDate = new DateTime($game['created']);
+                echo "Created: " . $createdDate->format('Y-m-d H:i:s') . " | ";
+            } else {
+                throw new Exception("Creation date not available.");
+            }
             if (isset($game['modified'])) {
                 $modifiedDate = new DateTime($game['modified']);
                 echo "Last modified: " . $modifiedDate->format('Y-m-d H:i:s');

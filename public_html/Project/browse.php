@@ -17,8 +17,25 @@ foreach ($games as &$game) {
     $game['Discount Price'] = format_price($game['Discount Price']);
 }
 unset($game); // Unset reference to the last element
+
+// Defines the columns to be displayed.
+$columnsToShow = [
+    'id',
+    'Title',
+    'Description',
+    'Release Date',
+    'Original Price',
+    'Discount Price',
+    'Currency Code'
+];
+
+// Extracts only the required columns from the games data.
+$gamesToShow = array_map(function ($game) use ($columnsToShow) {
+    return array_intersect_key($game, array_flip($columnsToShow));
+}, $games);
+
 // Creates table with corresponding values. USER version doesn't have a delete function.
-$table = ["data" => $games, "view_url" => "game_view.php", "edit_url" => "game_edit.php"];
+$table = ["data" => $gamesToShow, "view_url" => "game_view.php", "edit_url" => "game_edit.php"];
 ?>
 
 <div class="container-fluid">
