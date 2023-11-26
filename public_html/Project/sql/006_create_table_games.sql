@@ -16,7 +16,7 @@ CREATE TABLE Games ( -- Table for storing all games and their info.
     PRIMARY KEY (`id`), -- The record ID is the primary key.
     UNIQUE KEY (`api_id`), -- All API IDs must be unique.
     UNIQUE KEY (`title`) -- All game titles must be unique.
-);
+); -- DJA35 - 11/27/2023
 /*CREATE TABLE CA_Breeds(
     `id`         int auto_increment not null,
     `api_id`    VARCHAR(10),

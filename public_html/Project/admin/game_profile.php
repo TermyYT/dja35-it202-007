@@ -13,7 +13,7 @@ if (!has_role("Admin")) {
 
 $id = (int)se($_GET, "id", 0, false); // Used to acquire the id value for the record.
 $game = [];
-
+// DJA35 - 11/27/2023 - After validation, update or save data accordingly.
 if (count($_POST) > 0) {
     if (isset($_POST["search"])) { // If there's a search happening...
         $searchedId = (int)$_POST["searchedId"];
@@ -41,6 +41,7 @@ if (count($_POST) > 0) {
     }
 }
 $back = "admin/game_list.php"; // Set for the Back button.
+// DJA35 - 11/27/2023 - Fetching the record details.
 if ($id > 0) {
     $db = getDB();
 
@@ -63,7 +64,7 @@ if ($id > 0) {
     }
 }
 ?>
-<div class="container-fluid">
+<div class="container-fluid"> <!-- DJA35 - 11/27/2023 - The form itself. -->
     <h1>Game Profile (Create/Update)</h1>
     <form method="post" class="mb-3">
         <label for="searchedId">Jump to Game ID:</label>

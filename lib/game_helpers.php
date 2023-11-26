@@ -130,7 +130,7 @@ function _build_search_query(&$params, $search)
         }
         $query .= " ORDER BY $col $order"; //<-- Be absolutely sure you trust these values; we can't bind certain parts of the query due to how the parameter mapping works
     }
-    
+    // DJA35 - 11/27/2023
     // Limit condition - Takes value. Limits it from 1 to 100. Appends it to query. Default is 10.
     if (isset($search["limit"]) && !empty($search["limit"])) {
         $limit = (int)$search["limit"];
@@ -173,7 +173,7 @@ function validate_game($game) {
     $currencyCode = se($game, "currencyCode", "", false);
 
     $has_error = false;
-
+    // DJA35 - 11/27/2023 - Backend Game Validation
     // Title rules
     if (empty($title) || strlen($title) < 2) {
         flash("Title must be at least 2 characters long", "warning");

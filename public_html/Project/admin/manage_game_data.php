@@ -19,7 +19,7 @@ if (!has_role("Admin")) {
     die(header("Location: " . get_url("home.php")));
 }
 //TODO need to update insert_games... to use the $mappings array and not go based on is_int for value
-function insert_games_into_db($db, $games, $mappings) // Inserts games into the database and handles duplicate data.
+function insert_games_into_db($db, $games, $mappings) // DJA35 - 11/27/2023 - Inserts games into the database and handles duplicate data.
 {
     // Prepare SQL query
     $query = "INSERT INTO `Games` ";
@@ -46,7 +46,7 @@ function insert_games_into_db($db, $games, $mappings) // Inserts games into the 
             return $carry;
         }, []);
 
-        $query .= " ON DUPLICATE KEY UPDATE " . implode(",", $updates); // How duplicate records are handled.
+        $query .= " ON DUPLICATE KEY UPDATE " . implode(",", $updates); // DJA35 - 11/27/2023 - How duplicate records are handled.
 
         // Prepare the statement
         $stmt = $db->prepare($query);
@@ -73,7 +73,7 @@ function insert_games_into_db($db, $games, $mappings) // Inserts games into the 
     }
 }
 
-function process_single_game($game, $columns, $mappings) // Maps a single game's data from the API to the database columns.
+function process_single_game($game, $columns, $mappings) // DJA35 - 11/27/2023 - Maps a single game's data from the API to the database columns.
 {
     // Prepare record
     $record = [];
@@ -114,7 +114,7 @@ function process_single_game($game, $columns, $mappings) // Maps a single game's
     return $record;
 }
 
-function process_games($result/*, $searchTerm = null*/) // Processes the API response, extracts data, and triggers the insertion into the database.
+function process_games($result, $searchTerm = null) // DJA35 - 11/27/2023 - Processes the API response, extracts data, and triggers the insertion into the database.
 {
     $status = se($result, "status", 400, false);
     if ($status != 200) { // Status 200 is a success.
@@ -169,11 +169,11 @@ function process_games($result/*, $searchTerm = null*/) // Processes the API res
         flash("No games were found. Please try again.", "warning");
     }
 }
-function process_search($searchTerm) // We begin the process of fetching API data through this search. This page is only available to the ADMIN role.
+function process_search($searchTerm) // DJA35 - 11/27/2023 - We begin the process of fetching API data through this search. This page is only available to the ADMIN role.
 {
     $encodedSearchTerm = urlencode($searchTerm);
     $result = get("https://epic-store-games.p.rapidapi.com/onSale", "GAME_API_KEY", ["searchWords" => $encodedSearchTerm, "limit" => 75, "page" => 0], true);
-process_games($result/*, $searchTerm*/);
+    process_games($result, $searchTerm);
 }
 $action = se($_POST, "action", "", false);
 if ($action) {
@@ -190,7 +190,7 @@ if ($action) {
 }
 ?>
 <div class="container-fluid">
-    <h1>Game Database Management</h1>
+    <h1>Game Database Management</h1> <!-- DJA35 - 11/27/2023 -->
     <!-- Search form -->
     <div class="row mt-3">
         <div class="col">
