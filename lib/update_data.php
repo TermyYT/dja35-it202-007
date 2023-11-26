@@ -1,5 +1,5 @@
 <?php
-
+// Used to update the posted db data.
 function update_data($table, $id,  $data, $ignore = ["id", "submit"])
 {
     $columns = array_keys($data);
