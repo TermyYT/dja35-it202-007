@@ -50,6 +50,7 @@ function format_price($price) {
         return 'xx.xx';
     }
 }
+// Used to build the search query for the multi-view table.
 function _build_search_query(&$params, $search)
 {
     $query = "SELECT 
@@ -158,6 +159,8 @@ function bind_params($stmt, $params)
         $stmt->bindValue($k, $v, $type);
     }
 }
+
+// Is used to validate the posted game details on game_edit.php and admin/game_profile.php.
 function validate_game($game) {
     error_log("game: " . var_export($game, true));
     $title = se($game, "title", "", false);
@@ -220,7 +223,7 @@ function validate_game($game) {
     return !$has_error;
 }
 
-// Additional function to validate date format in validate_game()
+// Additional function for validating date format in validate_game().
 function validate_date($date) {
     $d = DateTime::createFromFormat('Y-m-d', $date);
     return $d && $d->format('Y-m-d') === $date;

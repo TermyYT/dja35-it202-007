@@ -6,50 +6,36 @@ if (!is_logged_in()) {
     redirect("login.php");
 }
 
-$id = (int)se($_GET, "id", 0, false);
+$id = (int)se($_GET, "id", 0, false); // Used to acquire the id value for the record.
 $game = [];
 
 if (count($_POST) > 0) {
-    if (isset($_POST["search"])) {
+    if (isset($_POST["search"])) { // If there's a search happening...
         $searchedId = (int)$_POST["searchedId"];
-        // Redirect to the same page with the specified game ID
-        redirect(get_url("game_edit.php?id=$searchedId"));
+        redirect(get_url("game_edit.php?id=$searchedId")); // Redirect to the same page with the specified game ID.
     } else {
         $game = $_POST;
-        if (!dupeTitleCheck($game, $id)) {
-            if (validate_game($game)) {
-                if ($id > 0) {
-                    // Update existing game entry
-                    if (update_data("Games", $id, $game, ["id"])) {
-                        flash("Game entry updated successfully", "success");
-                        redirect("game_edit.php?id=$id");
-                    }
-                } else {
-                    // Create a new game entry
-                    $newGameId = save_data("Games", $game);
-                    if ($newGameId) {
-                        flash("Game entry created successfully", "success");
-                        redirect("game_edit.php?id=$newGameId");
-                    }
+        if (validate_game($game)) { // Calls the validate_game() function in game_helpers.php.
+            if ($id > 0) {
+                // Update existing game entry.
+                if (update_data("Games", $id, $game, ["id"])) { // Calls the update_data.php file in lib folder.
+                    flash("Game entry updated successfully.", "success");
+                    redirect("game_edit.php?id=$id");
                 }
             } else {
-                flash("Invalid input. Please check your data and try again.", "danger");
+                // Create a new game entry
+                $newGameId = save_data("Games", $game); // Calls the save_data.php file in lib folder.
+                if ($newGameId) {
+                    flash("Game entry created successfully.", "success");
+                    redirect("game_edit.php?id=$newGameId");
+                }
             }
         } else {
-            flash("A game with the same title already exists.", "danger");
+            flash("Invalid input. Please check your data and try again.", "danger");
         }
     }
 }
-function dupeTitleCheck($game, $id)
-{
-    $db = getDB();
-    $query = "SELECT id FROM Games WHERE title = :title AND id != :id";
-    $stmt = $db->prepare($query);
-    $stmt->execute([":title" => $game["title"], ":id" => $id]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return ($result !== false);
-}
-$back = "browse.php";
+$back = "browse.php"; // Set for the Back button.
 if ($id > 0) {
     $db = getDB();
 
@@ -72,7 +58,6 @@ if ($id > 0) {
     }
 }
 ?>
-
 <div class="container-fluid">
     <h1>Game Profile (Create/Update)</h1>
     <form method="post" class="mb-3">

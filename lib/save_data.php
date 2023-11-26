@@ -1,4 +1,5 @@
 <?php
+// Used to save the posted db data.
 function save_data($table, $data, $ignore = ["submit"])
 {
     $table = se($table, null, null, false);
