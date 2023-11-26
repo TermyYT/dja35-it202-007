@@ -1,5 +1,14 @@
 <?php
-//note we need to go up 1 more directory
+/*
+This is the main page where the ADMIN user can perform a search for
+API data and populate the database 'Games' table with data. While
+process_games() can be mended to take in very specific titles, the
+current state takes in those titles and then some extras. It helps
+to populate the database such that the database can more easily be
+the first point of access for retrieving game information as opposed
+to the API itself. If a user wishes to alter the function, however,
+they can.
+*/
 require(__DIR__ . "/../../../partials/nav.php");
 if (!is_logged_in()) {
     flash("You must be logged in to view this page", "warning");
@@ -10,7 +19,7 @@ if (!has_role("Admin")) {
     die(header("Location: " . get_url("home.php")));
 }
 //TODO need to update insert_games... to use the $mappings array and not go based on is_int for value
-function insert_games_into_db($db, $games, $mappings)
+function insert_games_into_db($db, $games, $mappings) // Inserts games into the database and handles duplicate data.
 {
     // Prepare SQL query
     $query = "INSERT INTO `Games` ";
@@ -37,7 +46,7 @@ function insert_games_into_db($db, $games, $mappings)
             return $carry;
         }, []);
 
-        $query .= " ON DUPLICATE KEY UPDATE " . implode(",", $updates);
+        $query .= " ON DUPLICATE KEY UPDATE " . implode(",", $updates); // How duplicate records are handled.
 
         // Prepare the statement
         $stmt = $db->prepare($query);
@@ -64,7 +73,7 @@ function insert_games_into_db($db, $games, $mappings)
     }
 }
 
-function process_single_game($game, $columns, $mappings)
+function process_single_game($game, $columns, $mappings) // Maps a single game's data from the API to the database columns.
 {
     // Prepare record
     $record = [];
@@ -73,13 +82,13 @@ function process_single_game($game, $columns, $mappings)
     $record["publisherName"] = se($game, "publisherName", "", false);
     $record["description"] = se($game, "description", "", false);
 
-    //Parse date from API in the format of MySQL's DATETIME
+    // Parse the releaseDate from API in the format of MySQL's DATE.
     $releaseDate = se($game, "releaseDate", "", false);
     $dateTime = new DateTime($releaseDate);
     $record["releaseDate"] = $dateTime->format("Y-m-d");
 
     $record["url"] = se($game, "url", "", false);
-    $record["originalPrice"] = (int)se($game, "currentPrice", 0, false);
+    $record["originalPrice"] = (int)se($game, "currentPrice", 0, false); // The actual "originalPrice" field in the API was not desirable, but for the sake of this site, we note it down as originalPrice, anyway.
     $record["discountPrice"] = (int)se($game["price"]["totalPrice"], "discountPrice", 0, false);
     $record["currencyCode"] = se($game["price"]["totalPrice"], "currencyCode", "", false);
 
@@ -95,7 +104,7 @@ function process_single_game($game, $columns, $mappings)
         }
     }*/
     // Decode HTML entities for certain columns
-    $htmlDecodedColumns = ["title", "publisherName", "description", "currencyCode"];
+    $htmlDecodedColumns = ["title", "publisherName", "description", "currencyCode"]; // The fields that return strings must be decoded.
     foreach ($htmlDecodedColumns as $column) {
         if (isset($record[$column])) {
             $record[$column] = htmlspecialchars_decode($record[$column], ENT_QUOTES);
@@ -105,15 +114,15 @@ function process_single_game($game, $columns, $mappings)
     return $record;
 }
 
-function process_games($result, $searchTerm = null)
+function process_games($result/*, $searchTerm = null*/) // Processes the API response, extracts data, and triggers the insertion into the database.
 {
     $status = se($result, "status", 400, false);
-    if ($status != 200) {
+    if ($status != 200) { // Status 200 is a success.
         return;
     }
 
     // Extract data from result
-    $data_string = html_entity_decode(se($result, "response", "{}", false));
+    $data_string = html_entity_decode(se($result, "response", "{}", false)); // We decode the result from the API here.
     $wrapper = "{\"data\":$data_string}";
     $data = json_decode($wrapper, true);
     if (!isset($data["data"])) {
@@ -140,31 +149,31 @@ function process_games($result, $searchTerm = null)
         foreach ($columnsData as $column) {
             $mappings[$column['Field']] = $column['Type'];
         }
-        $ignored = ["id", "created", "modified"];
+        $ignored = ["id", "created", "modified"]; // These columns will be automatically populated in the db.
         $columns = array_diff($columns, $ignored);
 
         // Process each game
         $games = [];
         foreach ($data as $game) {
-            // Check if the game title contains the search term
+            // Check if the game title contains the search term - Can be uncommented for more specific searches.
             /*if ($searchTerm !== null && stripos($game['title'], $searchTerm) === false) {
-                continue; // Skip this game if the title doesn't match the search term
+                continue; // Skip this game if the title doesn't match the search term.
             }*/
-            $record = process_single_game($game, $columns, $mappings);
+            $record = process_single_game($game, $columns, $mappings); // Processes a single game's data and maps it.
             array_push($games, $record);
         }
         // Insert games into database
-        insert_games_into_db($db, $games, $mappings);
+        insert_games_into_db($db, $games, $mappings); // The call to push all the data into the database.
         flash ("Games added to database", "success");
     } else {
         flash("No games were found. Please try again.", "warning");
     }
 }
-function process_search($searchTerm)
+function process_search($searchTerm) // We begin the process of fetching API data through this search. This page is only available to the ADMIN role.
 {
     $encodedSearchTerm = urlencode($searchTerm);
     $result = get("https://epic-store-games.p.rapidapi.com/onSale", "GAME_API_KEY", ["searchWords" => $encodedSearchTerm, "limit" => 75, "page" => 0], true);
-    process_games($result, $searchTerm);
+process_games($result/*, $searchTerm*/);
 }
 $action = se($_POST, "action", "", false);
 if ($action) {
@@ -182,7 +191,6 @@ if ($action) {
 ?>
 <div class="container-fluid">
     <h1>Game Database Management</h1>
-
     <!-- Search form -->
     <div class="row mt-3">
         <div class="col">
@@ -191,7 +199,7 @@ if ($action) {
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search for games..." name="searchTerm" />
                     <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit">Search</button>
+                        <button class="btn btn-primary" type="submit">Search</button> <!-- The button that is clicked to initiate the API search. -->
                     </div>
                 </div>
             </form>
