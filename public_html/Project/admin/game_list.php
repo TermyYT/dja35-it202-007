@@ -50,6 +50,9 @@ $table = ["data" => $gamesToShow, "delete_url" => "admin/delete_game.php", "view
     <div>
         <?php render_table($table); ?> <!-- Calls table.php partial file which has the ADMIN delete function included. -->
     </div>
+    <div class="row">
+        <?php include(__DIR__ . "/../../../partials/pagination_nav.php"); ?>
+    </div>
 </div>
 
 <?php
