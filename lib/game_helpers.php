@@ -151,7 +151,7 @@ function _build_where_clause(&$query, &$params, $search)
     }
         // DJA35 - 11/27/2023
     // Limit condition - Takes value. Limits it from 1 to 100. Appends it to query. Default is 10.
-    if (isset($search["limit"]) && !empty($search["limit"])) {
+    /*if (isset($search["limit"]) && !empty($search["limit"])) {
         $limit = (int)$search["limit"];
         $limit = max(1, min(100, $limit)); // Ensures the limit is between 1 and 100.
         $query .= " LIMIT $limit";
@@ -159,7 +159,7 @@ function _build_where_clause(&$query, &$params, $search)
         // Use the default limit of 10.
         $query .= " LIMIT 10";
     }
-    return $query;
+    return $query;*/
 }
 
 function _build_search_query(&$params, $search)
@@ -188,16 +188,22 @@ function _build_search_query(&$params, $search)
     global $total;
     $total = (int)get_potential_total_records($total_query . $filter_query, $params);
     $limit = (int)se($search, "limit", 10, false);
-    error_log("total records: $total");
+    // error_log("total records: $total");
     $page = (int)se($search, "page", "1", false);
-    if ($limit > 0 && $limit <= 100 && $page > 0) {
+    // Calculate offset based on limit and page
+    $offset = ($page - 1) * $limit;
+    /*if ($limit > 0 && $limit <= 100 && $page > 0) {
         $offset = ($page - 1) * $limit;
         if (is_numeric($offset) && is_numeric($limit)) {
             $filter_query .= " LIMIT $offset, $limit"; // Offset is how many records to skip, limit is up to how many records to return for the page.
         }
+    }*/
+    if ($limit > 0 && $limit <= 100 && $page > 0) {
+        // Include LIMIT and OFFSET here
+        $search_query .= " LIMIT $offset, $limit";
     }
 
-    return $search_query . $filter_query;
+    return $search_query;
 }
 
 // Dynamically binds parameters based on value data type
