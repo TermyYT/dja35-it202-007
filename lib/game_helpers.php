@@ -54,7 +54,7 @@ function format_price($price) {
     }
 }
 
-function get_potential_total_records($query, $params)
+function get_potential_total_records($query, $params) // Fetches the total possible records.
 {
     if (!str_contains($query, "total")) {
         throw new Exception(("This query expects a 'total' column to be fetched"));
@@ -85,7 +85,7 @@ function get_potential_total_records($query, $params)
     return $total;
 }
 
-function _build_where_clause(&$query, &$params, $search)
+function _build_games_where_clause(&$query, &$params, $search) // WHERE clause is split off into its own function for modularity.
 {
     // Add conditions to the query based on the search parameters
     foreach ($search as $key => $value) {
@@ -149,8 +149,9 @@ function _build_where_clause(&$query, &$params, $search)
         }
         $query .= " ORDER BY $col $order"; //<-- Be absolutely sure you trust these values; we can't bind certain parts of the query due to how the parameter mapping works
     }
-        // DJA35 - 11/27/2023
+    // DJA35 - 11/27/2023
     // Limit condition - Takes value. Limits it from 1 to 100. Appends it to query. Default is 10.
+    // This is the Milestone 2 limit logic, but Milestone 3 updates this slightly.
     /*if (isset($search["limit"]) && !empty($search["limit"])) {
         $limit = (int)$search["limit"];
         $limit = max(1, min(100, $limit)); // Ensures the limit is between 1 and 100.
@@ -181,7 +182,7 @@ function _build_search_query(&$params, $search)
             WHERE 1=1";
     $total_query = "SELECT count(1) as total FROM Games AS g WHERE 1=1";
     
-    _build_where_clause($filter_query, $params, $search);
+    _build_games_where_clause($filter_query, $params, $search);
 
     // Added pagination (need limit and page to be in $search)
     // Produces a $total value for use in UI
@@ -199,7 +200,6 @@ function _build_search_query(&$params, $search)
         }
     }*/
     if ($limit > 0 && $limit <= 100 && $page > 0) {
-        // Include LIMIT and OFFSET here
         $search_query .= " LIMIT $offset, $limit";
     }
 

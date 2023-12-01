@@ -45,7 +45,7 @@ $table = ["data" => $gamesToShow, "delete_url" => "admin/delete_game.php", "view
 <div class="container-fluid">
     <h1>List Games</h1>
     <div>
-        <?php include(__DIR__ . "/../../../partials/search_form.php"); ?> <!-- Uses the search_form partial file to construct search form fields. -->
+        <?php include(__DIR__ . "/../../../partials/game_search_form.php"); ?> <!-- Uses the search_form partial file to construct search form fields. -->
     </div>
     <div>
         <?php render_table($table); ?> <!-- Calls table.php partial file which has the ADMIN delete function included. -->
