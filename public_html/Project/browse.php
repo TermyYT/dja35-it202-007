@@ -46,6 +46,9 @@ $table = ["data" => $gamesToShow, "view_url" => "game_view.php", "edit_url" => "
     <div>
         <?php render_user_table($table); ?> <!-- Calls table.php partial file which has ADMIN delete function in it. -->
     </div>
+    <div class="row">
+        <?php include(__DIR__ . "/../../partials/pagination_nav.php"); ?>
+    </div>
 </div>
 
 <?php
