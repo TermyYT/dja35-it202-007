@@ -31,6 +31,7 @@ session_start();
 <!-- include css and js files -->
 <link rel="stylesheet" href="<?php echo get_url('styles.css'); ?>">
 <script src="<?php echo get_url('helpers.js'); ?>"></script>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark ml-3 mb-3">
     <a class="navbar-brand ms-3" href="#">Epic Favorites</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
