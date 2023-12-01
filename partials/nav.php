@@ -31,32 +31,52 @@ session_start();
 <!-- include css and js files -->
 <link rel="stylesheet" href="<?php echo get_url('styles.css'); ?>">
 <script src="<?php echo get_url('helpers.js'); ?>"></script>
-<nav>
-    <ul>
-        <?php if (is_logged_in()) : ?> <!-- If logged in. -->
-            <li><a href="<?php echo get_url('home.php'); ?>">Home</a></li>
-            <li><a href="<?php echo get_url('profile.php'); ?>">User Profile</a></li>
-        <?php endif; ?>
-        <?php if (is_logged_in() && !has_role("Admin")) : ?> <!-- If logged in and doesn't have Admin role. -->
-            <li><a href="<?php echo get_url('game_edit.php'); ?>">Game Editor</a></li>
-            <li><a href="<?php echo get_url('game_view.php'); ?>">Game View</a></li>
-            <li><a href="<?php echo get_url('browse.php'); ?>">Game List</a></li>
-        <?php endif; ?>
-        <?php if (!is_logged_in()) : ?> <!-- If not logged in. -->
-            <li><a href="<?php echo get_url('login.php'); ?>">Login</a></li>
-            <li><a href="<?php echo get_url('register.php'); ?>">Register</a></li>
-        <?php endif; ?>
-        <?php if (is_logged_in() && has_role("Admin")) : ?> <!-- If logged in and has Admin role. -->
-            <li><a href="<?php echo get_url('admin/create_role.php'); ?>">Create Role</a></li>
-            <li><a href="<?php echo get_url('admin/list_roles.php'); ?>">List Roles</a></li>
-            <li><a href="<?php echo get_url('admin/assign_roles.php'); ?>">Assign Roles</a></li>
-            <li><a href="<?php echo get_url('admin/manage_game_data.php'); ?>">Manage Data</a></li>
-            <li><a href="<?php echo get_url('admin/game_profile.php'); ?>">Game Profile</a></li>
-            <li><a href="<?php echo get_url('admin/game_viewer.php'); ?>">Game Viewer</a></li>
-            <li><a href="<?php echo get_url('admin/game_list.php'); ?>">Game List</a></li>
-        <?php endif; ?>
-        <?php if (is_logged_in()) : ?> <!-- If logged in. -->
-            <li><a href="<?php echo get_url('logout.php'); ?>">Logout</a></li>
-        <?php endif; ?>
-    </ul>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark ml-3 mb-3">
+    <a class="navbar-brand ms-3" href="#">Epic Favorites</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <?php if (is_logged_in()) : ?>
+                <li class="nav-item"><a class="nav-link" href="<?php echo get_url('home.php'); ?>">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?php echo get_url('profile.php'); ?>">Profile</a></li>
+
+                <?php if (!has_role("Admin")) : ?>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="gamesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Games</a>
+                        <div class="dropdown-menu dropdown-menu-dark" aria-labelledby="gamesDropdown">
+                            <a class="dropdown-item" href="<?php echo get_url('game_edit.php'); ?>">Game Editor</a>
+                            <a class="dropdown-item" href="<?php echo get_url('game_view.php'); ?>">Game View</a>
+                            <a class="dropdown-item" href="<?php echo get_url('browse.php'); ?>">Game List</a>
+                        </div>
+                    </li>
+                <?php endif; ?>
+
+            <?php elseif (!is_logged_in()) : ?>
+                <li class="nav-item"><a class="nav-link" href="<?php echo get_url('login.php'); ?>">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?php echo get_url('register.php'); ?>">Register</a></li>
+            <?php endif; ?>
+
+            <?php if (is_logged_in() && has_role("Admin")) : ?>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin</a>
+                    <div class="dropdown-menu dropdown-menu-dark" aria-labelledby="adminDropdown">
+                        <a class="dropdown-item" href="<?php echo get_url('admin/create_role.php'); ?>">Create Role</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/list_roles.php'); ?>">List Roles</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/assign_roles.php'); ?>">Assign Roles</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/manage_game_data.php'); ?>">Manage Data</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/game_profile.php'); ?>">Game Profile</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/game_viewer.php'); ?>">Game Viewer</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/game_list.php'); ?>">Game List</a>
+                    </div>
+                </li>
+            <?php endif; ?>
+
+            <?php if (is_logged_in()) : ?>
+                <li class="nav-item"><a class="nav-link" href="<?php echo get_url('logout.php'); ?>">Logout</a></li>
+            <?php endif; ?>
+        </ul>
+    </div>
 </nav>
