@@ -13,7 +13,7 @@
 .alert-info {
     background-color: teal;
 }
-/*nav li{display: inline; background-color: #7c8bfb;}
+/*nav li{display: inline; background-color: #7c8bfb;} - Commented out in favor of new Bootstrap navbar in Milestone 3.
 nav li a{
     color: #000000; 
     text-decoration: none;
