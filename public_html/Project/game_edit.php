@@ -35,7 +35,7 @@ if (count($_POST) > 0) {
         }
     }
 }
-$back = "browse.php"; // Set for the Back button.
+$back = "game_browse.php"; // Set for the Back button.
 if ($id > 0) {
     $db = getDB();
 
@@ -49,12 +49,12 @@ if ($id > 0) {
             $game = $result;
         } else {
             flash("There was a problem finding this game", "danger");
-            redirect("browse.php");
+            redirect("game_browse.php");
         }
     } catch (PDOException $e) {
         error_log("Error fetching game by id: " . var_export($e, true));
         flash("An error fetching game by id has occured", "danger");
-        redirect("browse.php");
+        redirect("game_browse.php");
     }
 }
 ?>

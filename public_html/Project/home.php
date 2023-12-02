@@ -18,7 +18,7 @@ if (is_logged_in(true)) {
         <p>Do you want to have a personal wishlist for games sold on Epic Games?</p>
         <p>Do you want up-to-date information on sales going on?</p>
         <p>Use our service today!</p>
-        <p class="text-center"><a class="btn btn-primary btn-lg" href="<?php get_url("browse.php", true); ?>" role="button">Explore Games</a></p>
+        <p class="text-center"><a class="btn btn-primary btn-lg" href="<?php get_url("game_browse.php", true); ?>" role="button">Explore Games</a></p>
     </div>
 </div>
 <?php

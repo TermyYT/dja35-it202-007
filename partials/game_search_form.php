@@ -1,5 +1,5 @@
 <?php
-// This page is for defining the search form used with game_view.php and browse.php.
+// This page is for defining the search form used with game_view.php and game_browse.php.
 
 // make columns options for order by
 // map order columns

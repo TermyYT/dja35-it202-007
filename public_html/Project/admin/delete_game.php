@@ -39,7 +39,7 @@ if ($id <= 0) { // A check for an invalid game ID being passed.
 if (isset($_SESSION["previous"]) && strpos($_SESSION["previous"], "admin") !== false) { // Decides return point for user after deletion.
     $url = "admin/game_list.php"; // ADMIN game list.
 } else {
-    $url = "browse.php"; // USER game list.
+    $url = "game_browse.php"; // USER game list.
 }
 
 $url .= "?" . http_build_query($_GET);

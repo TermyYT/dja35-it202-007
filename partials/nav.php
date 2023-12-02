@@ -50,7 +50,7 @@ session_start();
                         <div class="dropdown-menu dropdown-menu-dark" aria-labelledby="gamesDropdown">
                             <a class="dropdown-item" href="<?php echo get_url('game_edit.php'); ?>">Game Editor</a>
                             <a class="dropdown-item" href="<?php echo get_url('game_view.php'); ?>">Game View</a>
-                            <a class="dropdown-item" href="<?php echo get_url('browse.php'); ?>">Game List</a>
+                            <a class="dropdown-item" href="<?php echo get_url('game_browse.php'); ?>">Game List</a>
                         </div>
                     </li>
                 <?php endif; ?>
