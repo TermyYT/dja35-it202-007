@@ -9,9 +9,10 @@ if (!isset($total)) {
     $total = 1;
 }
 
-$per_page = se($_GET, "limit", "10", false); // The default limit set per page is 10 records.
+$per_page = (int)se($_GET, "limit", "10", false); // The default limit set per page is 10 records.
 $page = se($_GET, "page", 1, false); // Starting with page 1.
 $total_pages = ceil($total / $per_page); // Math to determine how many pages should be displayed in the interface.
+error_log("Total value: " . var_export($total, true));
 //updates or inserts page into query string while persisting anything already present
 function persistQueryString($page)
 {

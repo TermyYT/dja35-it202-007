@@ -163,6 +163,7 @@ WHERE 1=1
     }
     $stmt = $db->prepare($query . $filter_query);
     bind_params($stmt, $params);
+    
     try {
         $stmt->execute();
         $results = $stmt->fetchAll();

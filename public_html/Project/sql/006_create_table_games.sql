@@ -13,6 +13,7 @@ CREATE TABLE Games ( -- Table for storing all games and their info.
     `currencyCode` VARCHAR(3), -- The game's 3-letter currency code. (e.g. - "USD")
     `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- The creation time for the record.
     `modified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- The update time for the record.
+    `isFavorite` BOOLEAN NOT NULL DEFAULT false; -- NEW - Checking if the record is favorited.
     PRIMARY KEY (`id`), -- The record ID is the primary key.
     UNIQUE KEY (`api_id`), -- All API IDs must be unique.
     UNIQUE KEY (`title`) -- All game titles must be unique.
