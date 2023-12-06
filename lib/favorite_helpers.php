@@ -11,7 +11,7 @@ function get_favorite_games($user_id)
     $stmt = $db->prepare($query);
 
     try {
-        $stmt->execute();
+        $stmt->execute([':user_id' => $user_id]);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($result) {
             return $result;
@@ -30,7 +30,7 @@ function add_favorite_game($user_id, $game_id)
     $stmt = $db->prepare($query);
 
     try {
-        $stmt->execute();
+        $stmt->execute([':user_id' => $user_id, ':game_id' => $game_id]);
         return true;
     } catch (PDOException $e) {
         error_log("Error adding favorite game: " . var_export($e, true));
@@ -46,11 +46,32 @@ function remove_favorite_game($user_id, $game_id)
     $stmt = $db->prepare($query);
 
     try {
-        $stmt->execute();
+        $stmt->execute([':user_id' => $user_id, ':game_id' => $game_id]);
         return true;
     } catch (PDOException $e) {
         error_log("Error removing favorite game: " . var_export($e, true));
     }
+    return false;
+}
+
+function is_game_favorited($user_id, $game_id)
+{
+    $query = "SELECT COUNT(1) as count
+              FROM UserFavorites
+              WHERE user_id = :user_id
+              AND game_id = :game_id";
+
+    $db = getDB();
+    $stmt = $db->prepare($query);
+
+    try {
+        $stmt->execute([':user_id' => $user_id, ':game_id' => $game_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result && $result['count'] > 0;
+    } catch (PDOException $e) {
+        error_log("Error checking if game is favorited: " . var_export($e, true));
+    }
+
     return false;
 }
 
@@ -98,11 +119,9 @@ function search_favorites($user_id = -1)
 
     // Execute the SQL statement and fetch results
     try {
-        $stmt->execute();
+        $stmt->execute([':user_id' => $user_id]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($results) {
-            // Format any necessary data before returning
-            // Example: $favorite['SomeField'] = format_some_field($favorite['SomeField']);
             return $results;
         }
     } catch (PDOException $e) {
@@ -120,9 +139,9 @@ function _build_favorites_where_clause(&$query, &$params, $search)
     foreach ($search as $key => $value) {
         if ($value == 0 || !empty($value)) {
             switch ($key) {
-                /*case "id":
+                /*case "id": // Could keep around for lazy-loading.
                     $params[":id"] = $value;
-                    $query .= " AND uf.id = :id";
+                    $query .= " AND uf.id = :id"; 
                     break;*/
                 case 'user_id':
                     $params[":user_id"] = $value;

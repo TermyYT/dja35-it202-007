@@ -1,7 +1,7 @@
 <?php
 $search = $_GET;
 $columns = ["title", "publisherName", "releaseDate", "originalPrice", "discountPrice", "currencyCode"];
-$VALID_FAVORITE_COLUMNS = ["title", "publisherName", "releaseDate", "originalPrice", "discountPrice", "currencyCode"];
+$VALID_FAVORITE_COLUMNS = ["title", /*"publisherName",*/ "releaseDate", "originalPrice", "discountPrice", /*"currencyCode"*/ "id"];
 
 $columns = array_map(function ($v) {
     return ["label" => str_replace("_", " ", $v), "value" => strtolower($v)];
