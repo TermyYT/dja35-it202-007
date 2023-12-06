@@ -39,13 +39,18 @@ $gamesToShow = array_map(function ($game) use ($columnsToShow) {
 }, $games);
 
 // Creates table with corresponding values. ADMIN version has a delete function.
-$table = ["data" => $gamesToShow, "delete_url" => "admin/delete_game.php", "view_url" => "admin/game_viewer.php", "edit_url" => "admin/game_profile.php"];
+$table = ["data" => $gamesToShow,
+"favorite_url" => "/../Project/favorite_game.php", 
+"view_url" => "admin/game_viewer.php",
+"edit_url" => "admin/game_profile.php",
+"delete_url" => "admin/delete_game.php" 
+];
 ?>
 
 <div class="container-fluid">
     <h1>List Games</h1>
     <div>
-        <?php include(__DIR__ . "/../../../partials/search_form.php"); ?> <!-- Uses the search_form partial file to construct search form fields. -->
+        <?php include(__DIR__ . "/../../../partials/game_search_form.php"); ?> <!-- Uses the search_form partial file to construct search form fields. -->
     </div>
     <div>
         <?php render_table($table); ?> <!-- Calls table.php partial file which has the ADMIN delete function included. -->

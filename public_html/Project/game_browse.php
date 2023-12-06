@@ -35,16 +35,27 @@ $gamesToShow = array_map(function ($game) use ($columnsToShow) {
 }, $games);
 
 // Creates table with corresponding values. USER version doesn't have a delete function.
-$table = ["data" => $gamesToShow, "view_url" => "game_view.php", "edit_url" => "game_edit.php"];
+if (has_role("Admin")) {
+    $table = ["data" => $gamesToShow,
+    "favorite_url" => "favorite_game.php", 
+    "view_url" => "admin/game_viewer.php",
+    "edit_url" => "admin/game_profile.php",
+    "delete_url" => "admin/delete_game.php"];
+} else {
+    $table = ["data" => $gamesToShow,
+    "favorite_url" => "favorite_game.php", 
+    "view_url" => "game_view.php",
+    "edit_url" => "game_edit.php"];
+}
 ?>
 
 <div class="container-fluid">
     <h1>List Games</h1>
     <div>
-        <?php include(__DIR__ . "/../../partials/search_form.php"); ?> <!-- Uses the search_form partial file to construct search form fields. -->
+        <?php include(__DIR__ . "/../../partials/game_search_form.php"); ?> <!-- Uses the search_form partial file to construct search form fields. -->
     </div>
     <div>
-        <?php render_user_table($table); ?> <!-- Calls table.php partial file which has ADMIN delete function in it. -->
+        <?php render_table($table); ?> <!-- Calls table.php partial file which has ADMIN delete function in it. -->
     </div>
     <div class="row">
         <?php include(__DIR__ . "/../../partials/pagination_nav.php"); ?>

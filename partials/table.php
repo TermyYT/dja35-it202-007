@@ -8,6 +8,10 @@
     if (!$_data) {
         $_data = [];
     }
+    $_favorite_url = se($data, "favorite_url", "", false); // Add Favorite URL
+    $_favorite_label = se($data, "favorite_label", "Favorite", false); // Default to "Favorite" label
+    $_unfavorite_label = se($data, "unfavorite_label", "Unfavorite", false); // Default to "Unfavorite" label
+    $_favorite_classes = se($data, "favorite_classes", "btn btn-success", false); // Default to success classes
     $_view_url = se($data, "view_url", "", false);
     $_view_label = se($data, "view_label", "View", false);
     $_view_classes = se($data, "view_classes", "btn btn-primary", false);
@@ -23,7 +27,7 @@
     // edge case that should consider a redesign
     $_post_self_form = isset($data["post_self_form"]) ? $data["post_self_form"] : [];
     // end edge case
-    $_has_atleast_one_url = $_view_url || $_edit_url || $_delete_url || $_post_self_form;
+    $_has_atleast_one_url = $_favorite_url || $_view_url || $_edit_url || $_delete_url || $_post_self_form;
     $_empty_message = se($data, "empty_message", "No records to show", false);
     $_header_override = isset($data["header_override"]) ? $data["header_override"] : []; // note: this is as csv string or an array
     // assumes csv list; explodes to array
@@ -50,7 +54,9 @@
         <?php if ($_header_override) : ?>
             <thead>
                 <?php foreach ($_header_override as $h) : ?>
-                    <th><?php se($h); ?></th>
+                    <?php if (!in_array($h, $_ignored_columns)) : ?>
+                        <th><?php se($h); ?></th>
+                    <?php endif; ?>
                 <?php endforeach; ?>
                 <?php if ($_has_atleast_one_url) : ?>
                     <th>Actions</th>
@@ -69,6 +75,19 @@
                         <?php $query_string = http_build_query($_GET); ?>
                         <?php if ($_has_atleast_one_url) : ?>
                             <td>
+                                <?php if ($_favorite_url) : ?>
+                                    <?php
+                                    $game_id = $row[$_primary_key_column];
+                                    error_log("GAME ID: " . $game_id);
+                                    $user_id = get_user_id();
+                                    error_log("USER ID: " . $user_id);
+                                    $isFavorited = is_game_favorited($user_id, $game_id);
+                                    $favorite_url = $_favorite_url . '?' . $_primary_key_column . '=' . $game_id . '&' . $query_string;
+                                    ?>
+                                    <a href="<?php echo $favorite_url; ?>" class="btn btn-<?php echo $isFavorited ? 'danger' : 'success'; ?>">
+                                        <?php echo $isFavorited ? 'Unfavorite' : 'Favorite'; ?>
+                                    </a>
+                                <?php endif; ?>
                                 <?php if ($_view_url) : ?>
                                     <a href="<?php get_url($_view_url, true); ?>?<?php se($_primary_key_column); ?>=<?php se($row, $_primary_key_column); ?>&<?php se($query_string); ?>" class="<?php se($_view_classes); ?>"><?php se($_view_label); ?></a>
                                 <?php endif; ?>

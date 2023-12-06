@@ -1,5 +1,5 @@
 <?php
-// This page is for defining the search form used with game_view.php and browse.php.
+// This page is for defining the search form used with game_view.php and game_browse.php.
 
 // make columns options for order by
 // map order columns
@@ -40,7 +40,7 @@ array_unshift($orders, ["label" => "(Order by...)", "value" => ""]);
             <?php render_input(["type" => "select", "id" => "order", "name" => "order", "label" => "Order", "options" => $orders, "value" => se($search, "order", "", false)]); ?>
         </div>
         <div class="col-auto">
-            <?php render_input(["type" => "number", "id" => "limit", "name" => "limit", "label" => "Record Limit (1-100)", "min" => 1, "max" => 100, "value" => se($search, "limit", "", false)]); ?>
+            <?php render_input(["type" => "number", "id" => "limit", "name" => "limit", "label" => "Record Limit (1-100)", "min" => 1, "max" => 100, "value" => se($search, "limit", "10", false)]); ?>
         </div>
     </div>
     <div class="row">
