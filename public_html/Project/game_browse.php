@@ -13,20 +13,20 @@ if (!is_logged_in()) {
 $games = search_games();
 // Format prices before rendering the table
 foreach ($games as &$game) {
-    $game['Original Price'] = format_price($game['Original Price']);
-    $game['Discount Price'] = format_price($game['Discount Price']);
+    $game['originalPrice'] = format_price($game['originalPrice']);
+    $game['discountPrice'] = format_price($game['discountPrice']);
 }
 unset($game); // Unset reference to the last element
 
 // Defines the columns to be displayed.
 $columnsToShow = [
     'id',
-    'Title',
-    'Description',
-    'Release Date',
-    'Original Price',
-    'Discount Price',
-    'Currency Code'
+    'title',
+    'description',
+    'releaseDate',
+    'originalPrice',
+    'discountPrice',
+    'currencyCode'
 ];
 
 // Extracts only the required columns from the games data.

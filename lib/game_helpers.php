@@ -1,6 +1,6 @@
 <?php
 // The columns to order the table by.
-$VALID_ORDER_COLUMNS = ["title", "releaseDate", "originalPrice", "discountPrice", "id"];
+$VALID_ORDER_COLUMNS = ["title", "releaseDate", "originalPrice", "discountPrice"/*, "id"*/];
 
 function search_games()
 {
@@ -29,8 +29,8 @@ function search_games()
         if ($result) {
             // Format prices before returning
             foreach ($result as $game) {
-                $game['Original Price'] = format_price($game['Original Price']);
-                $game['Discount Price'] = format_price($game['Discount Price']);
+                $game['originalPrice'] = format_price($game['originalPrice']);
+                $game['discountPrice'] = format_price($game['discountPrice']);
             }
             unset($game); // Unset reference to the last element
             $games = $result;
@@ -167,16 +167,16 @@ function _build_search_query(&$params, $search)
 {
     $search_query = "SELECT 
             g.id, 
-            TRIM(g.title) AS 'Title', 
-            TRIM(g.publisherName) AS 'Publisher', 
-            g.description AS 'Description', 
-            g.releaseDate AS 'Release Date', 
-            g.url AS 'URL', 
-            g.originalPrice AS 'Original Price',
-            g.discountPrice AS 'Discount Price', 
-            g.currencyCode AS 'Currency Code',
-            g.created AS 'Created',
-            g.modified AS 'Modified'
+            g.title/* AS 'Title'*/, 
+            g.publisherName/* AS 'Publisher'*/, 
+            g.description/* AS 'Description'*/, 
+            g.releaseDate/* AS 'Release Date'*/, 
+            g.url/* AS 'URL'*/, 
+            g.originalPrice/* AS 'Original Price'*/,
+            g.discountPrice/* AS 'Discount Price'*/, 
+            g.currencyCode/* AS 'Currency Code'*/,
+            g.created/* AS 'Created'*/,
+            g.modified/* AS 'Modified'*/
             FROM 
             Games AS g
             WHERE 1=1";

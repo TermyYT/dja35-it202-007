@@ -83,6 +83,7 @@ function search_favorites($user_id)
     $params = [];
     $search["user_id"]  = get_user_id();
     // Build the SQL query
+    error_log("Search prior to query: " . var_export($search, true));
     $query = _build_favorite_search_query($params, $search, $user_id);
 
     // Prepare the SQL statement
@@ -101,8 +102,8 @@ function search_favorites($user_id)
         if ($result) {
             // Format prices before returning
             foreach ($result as $game) {
-                $game['Original Price'] = format_price($game['Original Price']);
-                $game['Discount Price'] = format_price($game['Discount Price']);
+                $game['originalPrice'] = format_price($game['originalPrice']);
+                $game['discountPrice'] = format_price($game['discountPrice']);
             }
             unset($game); // Unset reference to the last element
             $games = $result;
@@ -196,19 +197,19 @@ function _build_favorites_where_clause(&$query, &$params, $search)
 function _build_favorite_search_query(&$params, $search, $user_id)
 {
     $search_query = "SELECT 
-            u.username AS 'Username',
+            u.username,
             uf.user_id,
             g.id, 
-            TRIM(g.title) AS 'Title', 
-            TRIM(g.publisherName) AS 'Publisher', 
-            g.description AS 'Description', 
-            g.releaseDate AS 'Release Date', 
-            g.url AS 'URL', 
-            g.originalPrice AS 'Original Price',
-            g.discountPrice AS 'Discount Price', 
-            g.currencyCode AS 'Currency Code',
-            g.created AS 'Created',
-            g.modified AS 'Modified'
+            g.title, 
+            g.publisherName, 
+            g.description, 
+            g.releaseDate, 
+            g.url, 
+            g.originalPrice,
+            g.discountPrice, 
+            g.currencyCode,
+            g.created,
+            g.modified
             FROM 
             UserFavorites uf
             JOIN Users u ON uf.user_id = u.id
@@ -218,8 +219,8 @@ function _build_favorite_search_query(&$params, $search, $user_id)
                     FROM UserFavorites uf
                     JOIN Games g ON uf.game_id = g.id
                     WHERE uf.user_id = :user_id";
-    error_log("Search query: " . var_export($search_query));
-    error_log("Params: " . var_export($params));
+    error_log("Search query: " . var_export($search_query, true));
+    error_log("Params: " . var_export($params, true));
     _build_favorites_where_clause($filter_query, $params, $search);
 
     // Added pagination (need limit and page to be in $search)
