@@ -20,7 +20,7 @@ foreach ($favorited_games as &$game) {
 unset($game); // Unset reference to the last element
 
 // Defines the columns to be displayed.
-$columnsToShow = [
+/*$columnsToShow = [
     'username',
     'id',
     'title',
@@ -29,17 +29,17 @@ $columnsToShow = [
     'originalPrice',
     'discountPrice',
     'currencyCode'
-];
+];*/
 
 // Extract required columns
-$gamesToShow = array_map(function ($game) use ($columnsToShow) {
+/*$gamesToShow = array_map(function ($game) use ($columnsToShow) {
     return array_intersect_key($game, array_flip($columnsToShow));
-}, $favorited_games);
+}, $favorited_games);*/
 
 // Table configuration
 if (has_role("Admin")) {
     $table = [
-        "data" => $gamesToShow,
+        "data" => $favorited_games,
         "favorite_url" => "favorite_game.php",
         "view_url" => "admin/game_viewer.php",
         "edit_url" => "admin/game_profile.php",
@@ -47,12 +47,13 @@ if (has_role("Admin")) {
     ];
 } else {
     $table = [
-        "data" => $gamesToShow,
+        "data" => $favorited_games,
         "favorite_url" => "favorite_game.php",
         "view_url" => "game_view.php",
         "edit_url" => "game_edit.php"
     ];
 }
+$table["ignored_columns"] = ["user_id", /*"id",*/ "publisherName", "url", "created", "modified"];
 ?>
 <div class="container-fluid">
     <h1>User Favorites</h1>
@@ -78,6 +79,10 @@ if (has_role("Admin")) {
         <?php include(__DIR__ . "/../../partials/pagination_nav.php"); ?>
     </div>
 </div>
+<style>
+    thead { text-transform: capitalize;}
+    a { text-decoration: none;}
+</style>
 <?php
 require_once(__DIR__ . "/../../partials/flash.php");
 ?>

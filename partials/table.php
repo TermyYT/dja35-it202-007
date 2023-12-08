@@ -69,9 +69,9 @@
                     <tr>
                         <?php foreach ($row as $k => $v) : ?>
                             <?php if (!in_array($k, $_ignored_columns)) : ?>
-                                <?php if ($k == "Username" && in_array("user_id", array_keys($row))) : ?>
-                                    <a href="<?php get_url("profile.php?id=", true);
-                                                se($row, "user_id"); ?>"><?php se($v); ?></a>
+                                <?php if ($k == "username" && in_array("user_id", array_keys($row))) : ?>
+                                    <td><a href="<?php get_url("profile.php?id=", true);
+                                                se($row, "user_id"); ?>"><?php se($v); ?></a></td>
                                 <?php else : ?>
                                     <td><?php se($v); ?></td>
                                 <?php endif; ?>

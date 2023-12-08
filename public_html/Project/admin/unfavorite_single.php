@@ -17,11 +17,10 @@ $game_id = (int)se($_GET, "id", 0, false);
 
 if ($game_id <= 0) {
     flash("Invalid game ID", "danger");
-    // Redirect based on the user's role
-    if (has_role("Admin")) {
-        redirect("admin/game_list.php");
+    if (isset($_SESSION["previous"]) && strpos($_SESSION["previous"], "admin") !== false) { // Decides return point for user after deletion.
+        redirect("admin/game_list.php"); // ADMIN game list.
     } else {
-        redirect("game_browse.php");
+        redirect("game_browse.php"); // USER game list.
     }
 }
 

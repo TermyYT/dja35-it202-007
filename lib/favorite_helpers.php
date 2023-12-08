@@ -78,13 +78,17 @@ function search_favorites($user_id)
 {
     // Initialize variables
     global $search;
-    $search = $_GET;
+    if (isset($search) && !empty($search)) { // NEW merging of search and get!
+        $search = array_merge($search, $_GET);
+    } else {
+        $search = $_GET;
+    }
     $games = [];
     $params = [];
     $search["user_id"]  = get_user_id();
     // Build the SQL query
     error_log("Search prior to query: " . var_export($search, true));
-    $query = _build_favorite_search_query($params, $search, $user_id);
+    $query = _build_favorite_search_query($params, $search);
 
     // Prepare the SQL statement
     $db = getDB();
@@ -194,7 +198,7 @@ function _build_favorites_where_clause(&$query, &$params, $search)
     }
 }
 
-function _build_favorite_search_query(&$params, $search, $user_id)
+function _build_favorite_search_query(&$params, $search)
 {
     $search_query = "SELECT 
             u.username,
@@ -228,7 +232,6 @@ function _build_favorite_search_query(&$params, $search, $user_id)
     global $total;
     $total = (int)get_potential_total_records($total_query . $filter_query, $params);
 
-    $params = [":user_id"=>$user_id];
     global $shown_records;
     $shown_records = (int)get_potential_total_records($total_query, $params);
 
