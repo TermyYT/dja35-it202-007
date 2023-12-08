@@ -12,9 +12,13 @@ if (!is_logged_in()) {
     redirect("login.php");
 }
 
-$user_id = get_user_id();
-$game_id = (int)se($_GET, "id", 0, false);
+$user_id = se($_GET, "user_id", get_user_id(), false);
+if ($user_id <= 0) {
+    flash("Invalid user ID", "danger");
+    redirect("game_browse.php");
+}
 
+$game_id = (int)se($_GET, "id", 0, false);
 if ($game_id <= 0) {
     flash("Invalid game ID", "danger");
     if (isset($_SESSION["previous"]) && strpos($_SESSION["previous"], "admin") !== false) { // Decides return point for user after deletion.

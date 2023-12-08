@@ -152,11 +152,11 @@ function _build_favorites_where_clause(&$query, &$params, $search)
                     break;
                 case 'originalPrice':
                     $params[":originalPrice"] = $value;
-                    $query .= " AND g.originalPrice = :originalPrice";
+                    $query .= " AND g.originalPrice <= :originalPrice";
                     break;
                 case 'discountPrice':
                     $params[":discountPrice"] = $value;
-                    $query .= " AND g.discountPrice = :discountPrice";
+                    $query .= " AND g.discountPrice <= :discountPrice";
                     break;
                 case 'currencyCode':
                     $params[":currencyCode"] = $value;
@@ -223,8 +223,7 @@ function _build_favorite_search_query(&$params, $search)
                     FROM UserFavorites uf
                     JOIN Games g ON uf.game_id = g.id
                     WHERE uf.user_id = :user_id";
-    error_log("Search query: " . var_export($search_query, true));
-    error_log("Params: " . var_export($params, true));
+
     _build_favorites_where_clause($filter_query, $params, $search);
 
     // Added pagination (need limit and page to be in $search)

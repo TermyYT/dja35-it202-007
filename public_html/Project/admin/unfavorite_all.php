@@ -17,7 +17,7 @@ if (!has_role("Admin")) {
     redirect("home.php");
 }
 
-$user_id = get_user_id();
+$user_id = se($_GET, "user_id", get_user_id(), false);
 
 // Check if the "Unfavorite All" button is clicked
 if (isset($_POST['unfavorite_all'])) {

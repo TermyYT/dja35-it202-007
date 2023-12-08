@@ -9,7 +9,7 @@ if (!is_logged_in()) {
 
 // Retrieve favorited games for the logged-in user
 // get_favorite_games() function is in favorite_helpers.php
-$user_id = get_user_id();
+$user_id = se($_GET, "user_id", get_user_id(), false);
 $favorited_games = search_favorites($user_id);
 
 // Format prices before rendering the table

@@ -1,5 +1,6 @@
 <?php if (isset($data)) : ?>
     <?php
+    error_log("THE DATA: " . var_export($data, true));
     // This is the table for ADMIN users.
     //setup some variables for readability
     $_extra_classes = se($data, "extra_classes", "", false);
@@ -83,9 +84,9 @@
                                 <?php if ($_favorite_url) : ?>
                                     <?php
                                     $game_id = $row[$_primary_key_column];
-                                    $user_id = get_user_id();
+                                    $user_id = se($row, "user_id", get_user_id(), false);
                                     $isFavorited = is_game_favorited($user_id, $game_id);
-                                    $favorite_url = $_favorite_url . '?' . $_primary_key_column . '=' . $game_id . '&' . $query_string;
+                                    $favorite_url = $_favorite_url . '?' . $_primary_key_column . '=' . $game_id . '&user_id=' . $user_id . '&' . $query_string;
                                     ?>
                                     <a href="<?php echo $favorite_url; ?>" class="btn btn-<?php echo $isFavorited ? 'danger' : 'success'; ?>">
                                         <?php echo $isFavorited ? 'Unfavorite' : 'Favorite'; ?>

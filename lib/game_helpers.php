@@ -5,8 +5,13 @@ $VALID_ORDER_COLUMNS = ["title", "releaseDate", "originalPrice", "discountPrice"
 function search_games()
 {
     // Initialize variables
+    global $totalSearch;
     global $search; // Make search available outside of this function
-    $search = $_GET;
+    if (isset($search) && !empty($search)) {
+        $search = array_merge($search, $_GET);
+    } else {
+        $search = $_GET;
+    }
     $games = [];
     $params = [];
 
@@ -44,7 +49,8 @@ function search_games()
 }
 
 // Convert cents to dollars and format as currency.
-function format_price($price) {
+function format_price($price)
+{
     if (is_numeric($price)) {
         // Convert the price to a formatted string.
         return number_format($price / 100, 2);
@@ -56,21 +62,23 @@ function format_price($price) {
 
 function get_potential_total_records($query, $params) // Fetches the total possible records.
 {
+    error_log("The potential total records query is: " . var_export($query, true));
+    error_log("The potential total records params is: " . var_export($params, true));
     if (!str_contains($query, "total")) {
         throw new Exception(("This query expects a 'total' column to be fetched"));
     }
     $db = getDB();
     $stmt = $db->prepare($query);
-    
+
     // Temporarily remove mappings that don't exist for the total query
     // Note: This is okay as $params is passed by value in this case, not by reference
     $params = array_filter($params, function ($key) use ($query) {
         return str_contains($query, $key);
     }, ARRAY_FILTER_USE_KEY);
-    
+
     bind_params($stmt, $params);
     $total = 0;
-    
+
     try {
         $stmt->execute();
         $result = $stmt->fetch();
@@ -81,7 +89,7 @@ function get_potential_total_records($query, $params) // Fetches the total possi
     } catch (PDOException $e) {
         error_log("Error fetching total count for query: " . var_export($e, true));
     }
-    
+
     return $total;
 }
 
@@ -113,11 +121,11 @@ function _build_games_where_clause(&$query, &$params, $search) // WHERE clause i
                     break;
                 case 'originalPrice':
                     $params[":originalPrice"] = $value;
-                    $query .= " AND g.originalPrice = :originalPrice";
+                    $query .= " AND g.originalPrice <= :originalPrice";
                     break;
                 case 'discountPrice':
                     $params[":discountPrice"] = $value;
-                    $query .= " AND g.discountPrice = :discountPrice";
+                    $query .= " AND g.discountPrice <= :discountPrice";
                     break;
                 case 'currencyCode':
                     $params[":currencyCode"] = $value;
@@ -126,6 +134,10 @@ function _build_games_where_clause(&$query, &$params, $search) // WHERE clause i
                 case "id":
                     $params[":id"] = $value;
                     $query .= " AND g.id = :id";
+                    break;
+                case "isFavorite":
+                    $params[":isFavorite"] = $value;
+                    $query .= " AND g.isFavorite = :isFavorite";
                     break;
             }
         }
@@ -149,18 +161,6 @@ function _build_games_where_clause(&$query, &$params, $search) // WHERE clause i
         }
         $query .= " ORDER BY $col $order"; //<-- Be absolutely sure you trust these values; we can't bind certain parts of the query due to how the parameter mapping works
     }
-    // DJA35 - 11/27/2023
-    // Limit condition - Takes value. Limits it from 1 to 100. Appends it to query. Default is 10.
-    // This is the Milestone 2 limit logic, but Milestone 3 updates this slightly.
-    /*if (isset($search["limit"]) && !empty($search["limit"])) {
-        $limit = (int)$search["limit"];
-        $limit = max(1, min(100, $limit)); // Ensures the limit is between 1 and 100.
-        $query .= " LIMIT $limit";
-    } else {
-        // Use the default limit of 10.
-        $query .= " LIMIT 10";
-    }
-    return $query;*/
 }
 
 function _build_search_query(&$params, $search)
@@ -181,13 +181,26 @@ function _build_search_query(&$params, $search)
             Games AS g
             WHERE 1=1";
     $total_query = "SELECT count(1) as total FROM Games AS g WHERE 1=1";
-    
+
     _build_games_where_clause($filter_query, $params, $search);
 
     // Added pagination (need limit and page to be in $search)
     // Produces a $total value for use in UI
     global $total;
     $total = (int)get_potential_total_records($total_query . $filter_query, $params);
+
+    global $totalSearch;
+    $filter = " AND isFavorite = :isFavorite";
+    if(!isset($totalSearch)){
+        $totalSearch = [];
+        $filter = "";
+    }
+
+    global $total_records;
+    error_log("Total records here for line 203: " . var_export($totalSearch, true));
+    error_log("total_query here: " . var_export($total_query, true));
+    $total_records = (int)get_potential_total_records($total_query . $filter, $totalSearch);
+
     $limit = (int)se($search, "limit", 10, false);
     if (empty($limit) || $limit === 0) {
         $limit = 10;
@@ -196,12 +209,6 @@ function _build_search_query(&$params, $search)
     $page = (int)se($search, "page", "1", false);
     // Calculate offset based on limit and page
     $offset = ($page - 1) * $limit;
-    /*if ($limit > 0 && $limit <= 100 && $page > 0) {
-        $offset = ($page - 1) * $limit;
-        if (is_numeric($offset) && is_numeric($limit)) {
-            $filter_query .= " LIMIT $offset, $limit"; // Offset is how many records to skip, limit is up to how many records to return for the page.
-        }
-    }*/
     $search_query .= $filter_query;
     if ($limit > 0 && $limit <= 100 && $page > 0) {
         $search_query .= " LIMIT $offset, $limit";
@@ -226,7 +233,8 @@ function bind_params($stmt, $params)
 }
 
 // Is used to validate the posted game details on game_edit.php and admin/game_profile.php.
-function validate_game($game) {
+function validate_game($game)
+{
     error_log("game: " . var_export($game, true));
     $title = se($game, "title", "", false);
     $publisherName = se($game, "publisherName", "", false);
@@ -289,7 +297,13 @@ function validate_game($game) {
 }
 
 // Additional function for validating date format in validate_game().
-function validate_date($date) {
+function validate_date($date)
+{
     $d = DateTime::createFromFormat('Y-m-d', $date);
     return $d && $d->format('Y-m-d') === $date;
 }
+
+/**
+ * THE CODE BELOW IS FOR unfavorited_game.php.
+ * The goal here was to, for the time being, reuse certain functions for the purposes of that page. Keep in mind that 
+ */
