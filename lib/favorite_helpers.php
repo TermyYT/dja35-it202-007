@@ -74,43 +74,20 @@ function is_game_favorited($user_id, $game_id)
 
     return false;
 }
-
-function search_favorites($user_id = -1)
+function search_favorites($user_id)
 {
-    $db = getDB();
+    // Initialize variables
+    global $search;
     $search = $_GET;
-    $total_query = "SELECT count(1) as total 
-                    FROM UserFavorites uf
-                    JOIN Games g ON uf.game_id = g.id
-                    WHERE uf.user_id = :user_id";
-
-    $query = "SELECT g.id, g.title, g.publisherName, g.description, g.releaseDate, g.url, g.originalPrice, g.discountPrice, g.currencyCode
-              FROM UserFavorites uf
-              JOIN Games g ON uf.game_id = g.id
-              WHERE uf.user_id = :user_id";
-
-    // Checking if user_id exists and setting it.
-    if ($user_id > 0) {
-        $search["user_id"] = $user_id;
-    }
-    _build_favorites_where_clause($filter_query, $params, $search);
-
-    // Pagination logic.
-    global $total;
-    $total = (int)get_potential_total_records($total_query . $filter_query, $params);
-    $limit = (int)se($search, "limit", 10, false);
-    error_log("total records: $total");
-    $page = (int)se($search, "page", "1", false);
-
-    if ($limit > 0 && $limit <= 100 && $page > 0) {
-        $offset = ($page - 1) * $limit;
-        if (is_numeric($offset) && is_numeric($limit)) {
-            $filter_query .= " LIMIT $offset, $limit";
-        }
-    }
+    $games = [];
+    $params = [];
+    $search["user_id"]  = get_user_id();
+    // Build the SQL query
+    $query = _build_favorite_search_query($params, $search, $user_id);
 
     // Prepare the SQL statement
-    $stmt = $db->prepare($query . $filter_query);
+    $db = getDB();
+    $stmt = $db->prepare($query);
 
     // Bind parameters to the SQL statement
     bind_params($stmt, $params);
@@ -119,19 +96,24 @@ function search_favorites($user_id = -1)
 
     // Execute the SQL statement and fetch results
     try {
-        $stmt->execute([':user_id' => $user_id]);
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if ($results) {
-            return $results;
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($result) {
+            // Format prices before returning
+            foreach ($result as $game) {
+                $game['Original Price'] = format_price($game['Original Price']);
+                $game['Discount Price'] = format_price($game['Discount Price']);
+            }
+            unset($game); // Unset reference to the last element
+            $games = $result;
         }
     } catch (PDOException $e) {
         flash("An error occurred while searching for favorites: " . $e->getMessage(), "warning");
         error_log("Favorites Search Error: " . var_export($e, true));
     }
 
-    return [];
+    return $games;
 }
-
 
 function _build_favorites_where_clause(&$query, &$params, $search)
 {
@@ -139,6 +121,42 @@ function _build_favorites_where_clause(&$query, &$params, $search)
     foreach ($search as $key => $value) {
         if ($value == 0 || !empty($value)) {
             switch ($key) {
+                case 'username':
+                    $params[":username"] = "%$value%"; // Looking for any matching strings.
+                    $query .= " AND u.username LIKE :username";
+                    break;
+                case 'title':
+                    $params[":title"] = "%$value%"; // Looking for any matching strings.
+                    $query .= " AND g.title LIKE :title";
+                    break;
+                case 'publisherName':
+                    $params[":publisherName"] = "%$value%"; // Looking for any matching strings.
+                    $query .= " AND g.publisherName LIKE :publisherName";
+                    break;
+                case 'description':
+                    $params[":description"] = $value;
+                    $query .= " AND g.description LIKE :description";
+                    break;
+                case 'releaseDate':
+                    $params[":releaseDate"] = $value;
+                    $query .= " AND g.releaseDate = :releaseDate";
+                    break;
+                case 'url':
+                    $params[":url"] = $value;
+                    $query .= " AND g.url LIKE :url";
+                    break;
+                case 'originalPrice':
+                    $params[":originalPrice"] = $value;
+                    $query .= " AND g.originalPrice = :originalPrice";
+                    break;
+                case 'discountPrice':
+                    $params[":discountPrice"] = $value;
+                    $query .= " AND g.discountPrice = :discountPrice";
+                    break;
+                case 'currencyCode':
+                    $params[":currencyCode"] = $value;
+                    $query .= " AND g.currencyCode LIKE :currencyCode";
+                    break;
                 /*case "id": // Could keep around for lazy-loading.
                     $params[":id"] = $value;
                     $query .= " AND uf.id = :id"; 
@@ -161,21 +179,70 @@ function _build_favorites_where_clause(&$query, &$params, $search)
         $col = $search["column"];
         $order = $search["order"];
         // Prevent SQL injection by checking against a hard-coded list
-
         if (!in_array($col, $VALID_ORDER_COLUMNS)) {
-            $col = "user_id";
+            $col = "title";
         }
-
         if (!in_array($order, ["asc", "desc"])) {
             $order = "asc";
         }
-
         // Special mapping to use table name prefix to resolve ambiguity error
-
         if (in_array($col, ["created", "modified"])) {
             $col = "uf.$col";
         }
-
         $query .= " ORDER BY $col $order"; //<-- Be absolutely sure you trust these values; we can't bind certain parts of the query due to how the parameter mapping works
     }
+}
+
+function _build_favorite_search_query(&$params, $search, $user_id)
+{
+    $search_query = "SELECT 
+            u.username AS 'Username',
+            uf.user_id,
+            g.id, 
+            TRIM(g.title) AS 'Title', 
+            TRIM(g.publisherName) AS 'Publisher', 
+            g.description AS 'Description', 
+            g.releaseDate AS 'Release Date', 
+            g.url AS 'URL', 
+            g.originalPrice AS 'Original Price',
+            g.discountPrice AS 'Discount Price', 
+            g.currencyCode AS 'Currency Code',
+            g.created AS 'Created',
+            g.modified AS 'Modified'
+            FROM 
+            UserFavorites uf
+            JOIN Users u ON uf.user_id = u.id
+            JOIN Games g ON uf.game_id = g.id
+            WHERE 1=1";
+    $total_query = "SELECT count(1) as total 
+                    FROM UserFavorites uf
+                    JOIN Games g ON uf.game_id = g.id
+                    WHERE uf.user_id = :user_id";
+    error_log("Search query: " . var_export($search_query));
+    error_log("Params: " . var_export($params));
+    _build_favorites_where_clause($filter_query, $params, $search);
+
+    // Added pagination (need limit and page to be in $search)
+    // Produces a $total value for use in UI
+    global $total;
+    $total = (int)get_potential_total_records($total_query . $filter_query, $params);
+
+    $params = [":user_id"=>$user_id];
+    global $shown_records;
+    $shown_records = (int)get_potential_total_records($total_query, $params);
+
+    $limit = (int)se($search, "limit", 10, false);
+    if (empty($limit) || $limit === 0) {
+        $limit = 10;
+    }
+    // error_log("total records: $total");
+    $page = (int)se($search, "page", "1", false);
+    // Calculate offset based on limit and page
+    $offset = ($page - 1) * $limit;
+    $search_query .= $filter_query;
+    if ($limit > 0 && $limit <= 100 && $page > 0) {
+        $search_query .= " LIMIT $offset, $limit";
+    }
+
+    return $search_query;
 }

@@ -16,7 +16,7 @@ if (!is_logged_in()) {
 }
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
-    die(header("Location: " . get_url("home.php")));
+    redirect(get_url("home.php"));
 }
 //TODO need to update insert_games... to use the $mappings array and not go based on is_int for value
 function insert_games_into_db($db, $games, $mappings) // DJA35 - 11/27/2023 - Inserts games into the database and handles duplicate data.

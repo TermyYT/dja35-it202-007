@@ -67,9 +67,14 @@
             <?php if (is_array($_data) && count($_data) > 0) : ?>
                 <?php foreach ($_data as $row) : ?>
                     <tr>
-                        <?php foreach (array_values($row) as $v) : ?>
-                            <?php if (!in_array($v, $_ignored_columns)) : ?>
-                                <td><?php se($v); ?></td>
+                        <?php foreach ($row as $k => $v) : ?>
+                            <?php if (!in_array($k, $_ignored_columns)) : ?>
+                                <?php if ($k == "Username" && in_array("user_id", array_keys($row))) : ?>
+                                    <a href="<?php get_url("profile.php?id=", true);
+                                                se($row, "user_id"); ?>"><?php se($v); ?></a>
+                                <?php else : ?>
+                                    <td><?php se($v); ?></td>
+                                <?php endif; ?>
                             <?php endif; ?>
                         <?php endforeach; ?>
                         <?php $query_string = http_build_query($_GET); ?>
@@ -78,9 +83,7 @@
                                 <?php if ($_favorite_url) : ?>
                                     <?php
                                     $game_id = $row[$_primary_key_column];
-                                    error_log("GAME ID: " . $game_id);
                                     $user_id = get_user_id();
-                                    error_log("USER ID: " . $user_id);
                                     $isFavorited = is_game_favorited($user_id, $game_id);
                                     $favorite_url = $_favorite_url . '?' . $_primary_key_column . '=' . $game_id . '&' . $query_string;
                                     ?>
