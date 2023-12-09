@@ -35,7 +35,7 @@ $table["ignored_columns"] = [/*"id",*/ "publisherName", "url", "created", "modif
 ?>
 
 <div class="container-fluid">
-    <h1>List Games</h1>
+    <h1>All Unfavorited Games</h1>
     <?php
     // Display the total and visible records associated with the user;
     echo "<h4>Total: $total_records | Shown: " . count($games) . "</h4>";
@@ -44,10 +44,10 @@ $table["ignored_columns"] = [/*"id",*/ "publisherName", "url", "created", "modif
         <?php include(__DIR__ . "/../../../partials/game_search_form.php"); ?> <!-- Uses the search_form partial file to construct search form fields. -->
     </div>
     <div>
-        <?php render_table($table); ?> <!-- Calls table.php partial file which has the ADMIN delete function included. -->
+        <?php render_table($table); ?> <!-- Calls table.php partial file. -->
     </div>
     <div class="row">
-        <?php include(__DIR__ . "/../../../partials/pagination_nav.php"); ?>
+        <?php include(__DIR__ . "/../../../partials/pagination_nav.php"); ?> <!-- Adds pagination. -->
     </div>
 </div>
 <style>

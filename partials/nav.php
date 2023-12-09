@@ -72,6 +72,7 @@ session_start();
                         <a class="dropdown-item" href="<?php echo get_url('admin/game_profile.php'); ?>">Game Profile</a>
                         <a class="dropdown-item" href="<?php echo get_url('admin/game_viewer.php'); ?>">Game Viewer</a>
                         <a class="dropdown-item" href="<?php echo get_url('admin/game_list.php'); ?>">Game List</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/all_favorites.php'); ?>">Favorited Games</a>
                         <a class="dropdown-item" href="<?php echo get_url('admin/unfavorited_games.php'); ?>">Unfavorited Games</a>
                     </div>
                 </li>

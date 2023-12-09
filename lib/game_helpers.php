@@ -5,7 +5,6 @@ $VALID_ORDER_COLUMNS = ["title", "releaseDate", "originalPrice", "discountPrice"
 function search_games()
 {
     // Initialize variables
-    global $totalSearch;
     global $search; // Make search available outside of this function
     if (isset($search) && !empty($search)) {
         $search = array_merge($search, $_GET);
@@ -100,11 +99,11 @@ function _build_games_where_clause(&$query, &$params, $search) // WHERE clause i
         if ($value == 0 || !empty($value)) {
             switch ($key) {
                 case 'title':
-                    $params[":title"] = "%$value%"; // Looking for any matching strings.
+                    $params[":title"] = "%$value%";
                     $query .= " AND g.title LIKE :title";
                     break;
                 case 'publisherName':
-                    $params[":publisherName"] = "%$value%"; // Looking for any matching strings.
+                    $params[":publisherName"] = "%$value%";
                     $query .= " AND g.publisherName LIKE :publisherName";
                     break;
                 case 'description':
@@ -302,8 +301,3 @@ function validate_date($date)
     $d = DateTime::createFromFormat('Y-m-d', $date);
     return $d && $d->format('Y-m-d') === $date;
 }
-
-/**
- * THE CODE BELOW IS FOR unfavorited_game.php.
- * The goal here was to, for the time being, reuse certain functions for the purposes of that page. Keep in mind that 
- */
