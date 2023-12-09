@@ -1,100 +1,48 @@
 <?php
 require_once("game_helpers.php");
+require_once("favorite_helpers.php");
 
-function add_favorite_game($user_id, $game_id) // Creating an association between the user and the game.
+function search_all_favorites() // Initializing the search for favorites.
 {
-    $query = "INSERT INTO UserFavorites (user_id, game_id) VALUES (:user_id, :game_id)";
-    $db = getDB();
-    $stmt = $db->prepare($query);
-
-    try {
-        $stmt->execute([':user_id' => $user_id, ':game_id' => $game_id]);
-        return true;
-    } catch (PDOException $e) {
-        error_log("Error adding favorite game: " . var_export($e, true));
-    }
-
-    return false;
-}
-
-function remove_favorite_game($user_id, $game_id) // Removing an association between the user and the game.
-{
-    $query = "DELETE FROM UserFavorites WHERE user_id = :user_id AND game_id = :game_id";
-    $db = getDB();
-    $stmt = $db->prepare($query);
-
-    try {
-        $stmt->execute([':user_id' => $user_id, ':game_id' => $game_id]);
-        return true;
-    } catch (PDOException $e) {
-        error_log("Error removing favorite game: " . var_export($e, true));
-    }
-    return false;
-}
-
-function is_game_favorited($user_id, $game_id) // Checking if the game is favorited by anyone or not.
-{
-    $query = "SELECT COUNT(1) as count
-              FROM UserFavorites
-              WHERE user_id = :user_id
-              AND game_id = :game_id";
-
-    $db = getDB();
-    $stmt = $db->prepare($query);
-
-    try {
-        $stmt->execute([':user_id' => $user_id, ':game_id' => $game_id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result && $result['count'] > 0;
-    } catch (PDOException $e) {
-        error_log("Error checking if game is favorited: " . var_export($e, true));
-    }
-
-    return false;
-}
-function search_favorites() // Initializing the search for favorites.
-{
-    // Initialize variables
     global $search;
-    if (isset($search) && !empty($search)) { // NEW merging of search and get!
+    if (isset($search) && !empty($search)) {
         $search = array_merge($search, $_GET);
     } else {
         $search = $_GET;
     }
     $games = [];
     $params = [];
-    $search["user_id"] = get_user_id();
-    // Build the SQL query
-    $query = _build_favorite_search_query($params, $search);
 
-    // Prepare the SQL statement
+    error_log("Search prior to query: " . var_export($search, true));
+    $query = _build_all_favorites_search_query($params, $search);
+
     $db = getDB();
     $stmt = $db->prepare($query);
 
-    // Bind parameters to the SQL statement
     bind_params($stmt, $params);
+    error_log("all favorites search query: " . var_export($query, true));
+    error_log("params: " . var_export($params, true));
 
-    // Execute the SQL statement and fetch results
     try {
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($result) {
-            // Format prices before returning
             foreach ($result as $game) {
                 $game['originalPrice'] = format_price($game['originalPrice']);
                 $game['discountPrice'] = format_price($game['discountPrice']);
             }
-            unset($game); // Unset reference to the last element
+            unset($game);
             $games = $result;
         }
     } catch (PDOException $e) {
         flash("An error occurred while searching for favorites: " . $e->getMessage(), "warning");
+        error_log("All Favorites Search Error: " . var_export($e, true));
     }
 
     return $games;
 }
 
-function _build_favorites_where_clause(&$query, &$params, $search) // WHERE clause is split off into its own function for modularity.
+function _build_all_favorites_where_clause(&$query, &$params, $search) // WHERE clause is split off into its own function for modularity.
 {
     // Add conditions to the query based on the search parameters
     foreach ($search as $key => $value) {
@@ -159,7 +107,7 @@ function _build_favorites_where_clause(&$query, &$params, $search) // WHERE clau
         $order = $search["order"];
         // Prevent SQL injection by checking against a hard-coded list
         if (!in_array($col, $VALID_ORDER_COLUMNS)) {
-            $col = "title";
+            $col = "username";
         }
         if (!in_array($order, ["asc", "desc"])) {
             $order = "asc";
@@ -168,11 +116,11 @@ function _build_favorites_where_clause(&$query, &$params, $search) // WHERE clau
         if (in_array($col, ["created", "modified"])) {
             $col = "uf.$col";
         }
-        $query .= " ORDER BY $col $order"; //<-- Be absolutely sure you trust these values; we can't bind certain parts of the query due to how the parameter mapping works
+        $query .= " ORDER BY $col $order";
     }
 }
 
-function _build_favorite_search_query(&$params, $search) // Assembling the search query.
+function _build_all_favorites_search_query(&$params, $search) // Assembling the search query.
 {
     $search_query = "SELECT 
             u.username,
@@ -187,18 +135,19 @@ function _build_favorite_search_query(&$params, $search) // Assembling the searc
             g.discountPrice, 
             g.currencyCode,
             g.created,
-            g.modified
+            g.modified,
+            (SELECT COUNT(1) FROM UserFavorites uf2 WHERE uf2.game_id = uf.game_id) as totalUsers
             FROM 
             UserFavorites uf
             JOIN Users u ON uf.user_id = u.id
             JOIN Games g ON uf.game_id = g.id
             WHERE 1=1";
-    $total_query = "SELECT count(1) as total 
+    $total_query = "SELECT COUNT(DISTINCT uf.game_id) AS total
                     FROM UserFavorites uf
                     JOIN Games g ON uf.game_id = g.id
-                    WHERE uf.user_id = :user_id";
+                    JOIN Users u ON uf.user_id = u.id";
 
-    _build_favorites_where_clause($filter_query, $params, $search);
+    _build_all_favorites_where_clause($filter_query, $params, $search);
 
     // Added pagination (need limit and page to be in $search)
     // Produces a $total value for use in UI
@@ -212,7 +161,6 @@ function _build_favorite_search_query(&$params, $search) // Assembling the searc
     if (empty($limit) || $limit === 0) {
         $limit = 10;
     }
-    // error_log("total records: $total");
     $page = (int)se($search, "page", "1", false);
     // Calculate offset based on limit and page
     $offset = ($page - 1) * $limit;

@@ -29,7 +29,7 @@
     $_post_self_form = isset($data["post_self_form"]) ? $data["post_self_form"] : [];
     // end edge case
     $_has_atleast_one_url = $_favorite_url || $_view_url || $_edit_url || $_delete_url || $_post_self_form;
-    $_empty_message = se($data, "empty_message", "No records to show", false);
+    $_empty_message = se($data, "empty_message", "No matching records", false);
     $_header_override = isset($data["header_override"]) ? $data["header_override"] : []; // note: this is as csv string or an array
     // assumes csv list; explodes to array
     if (is_string($_header_override)) {
@@ -71,7 +71,7 @@
                         <?php foreach ($row as $k => $v) : ?>
                             <?php if (!in_array($k, $_ignored_columns)) : ?>
                                 <?php if ($k == "username" && in_array("user_id", array_keys($row))) : ?>
-                                    <td><a href="<?php get_url("profile.php?id=", true);
+                                    <td><a href="<?php get_url("profile.php?id=", true); // Linking to the user's profile via the table.
                                                 se($row, "user_id"); ?>"><?php se($v); ?></a></td>
                                 <?php else : ?>
                                     <td><?php se($v); ?></td>
@@ -82,7 +82,7 @@
                         <?php if ($_has_atleast_one_url) : ?>
                             <td>
                                 <?php if ($_favorite_url) : ?>
-                                    <?php
+                                    <?php // Dictates the function of the Favorite/Unfavorite button in the table.
                                     $game_id = $row[$_primary_key_column];
                                     $user_id = se($row, "user_id", get_user_id(), false);
                                     $isFavorited = is_game_favorited($user_id, $game_id);

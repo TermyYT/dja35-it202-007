@@ -12,7 +12,7 @@ require(__DIR__ . "/safer_echo.php");
 //TODO 2: filter helpers
 require(__DIR__ . "/sanitizers.php");
 
-//TODO 3: User helpers - OUTDATED
+//TODO 3: User helpers
 require(__DIR__ . "/user_helpers.php");
 
 
@@ -34,6 +34,8 @@ require(__DIR__ . "/api_helper.php");
 require(__DIR__ . "/game_helpers.php");
 //Favorite Helper
 require(__DIR__ . "/favorite_helpers.php");
+//Favorite Helper
+require(__DIR__ . "/all_favorites_helpers.php");
 
 //Update Data
 require(__DIR__ . "/update_data.php");

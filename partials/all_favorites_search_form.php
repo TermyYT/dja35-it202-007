@@ -17,6 +17,9 @@ array_unshift($orders, ["label" => "(Order by...)", "value" => ""]);
 <form method="GET">
     <div class="row">
         <div class="col-auto">
+            <?php render_input(["type" => "text", "id" => "username", "name" => "username", "label" => "Username", "value" => se($search, "username", "", false)]); ?>
+        </div>
+        <div class="col-auto">
             <?php render_input(["type" => "text", "id" => "title", "name" => "title", "label" => "Title", "value" => se($search, "title", "", false)]); ?>
         </div>
         <div class="col-auto">
