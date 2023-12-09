@@ -1,5 +1,6 @@
 <?php if (isset($data)) : ?>
     <?php
+    error_log("THE DATA: " . var_export($data, true));
     // This is the table for ADMIN users.
     //setup some variables for readability
     $_extra_classes = se($data, "extra_classes", "", false);
@@ -28,7 +29,7 @@
     $_post_self_form = isset($data["post_self_form"]) ? $data["post_self_form"] : [];
     // end edge case
     $_has_atleast_one_url = $_favorite_url || $_view_url || $_edit_url || $_delete_url || $_post_self_form;
-    $_empty_message = se($data, "empty_message", "No records to show", false);
+    $_empty_message = se($data, "empty_message", "No matching records", false);
     $_header_override = isset($data["header_override"]) ? $data["header_override"] : []; // note: this is as csv string or an array
     // assumes csv list; explodes to array
     if (is_string($_header_override)) {
@@ -67,22 +68,25 @@
             <?php if (is_array($_data) && count($_data) > 0) : ?>
                 <?php foreach ($_data as $row) : ?>
                     <tr>
-                        <?php foreach (array_values($row) as $v) : ?>
-                            <?php if (!in_array($v, $_ignored_columns)) : ?>
-                                <td><?php se($v); ?></td>
+                        <?php foreach ($row as $k => $v) : ?>
+                            <?php if (!in_array($k, $_ignored_columns)) : ?>
+                                <?php if ($k == "username" && in_array("user_id", array_keys($row))) : ?>
+                                    <td><a href="<?php get_url("profile.php?id=", true); // Linking to the user's profile via the table.
+                                                se($row, "user_id"); ?>"><?php se($v); ?></a></td>
+                                <?php else : ?>
+                                    <td><?php se($v); ?></td>
+                                <?php endif; ?>
                             <?php endif; ?>
                         <?php endforeach; ?>
                         <?php $query_string = http_build_query($_GET); ?>
                         <?php if ($_has_atleast_one_url) : ?>
                             <td>
                                 <?php if ($_favorite_url) : ?>
-                                    <?php
+                                    <?php // Dictates the function of the Favorite/Unfavorite button in the table.
                                     $game_id = $row[$_primary_key_column];
-                                    error_log("GAME ID: " . $game_id);
-                                    $user_id = get_user_id();
-                                    error_log("USER ID: " . $user_id);
+                                    $user_id = se($row, "user_id", get_user_id(), false);
                                     $isFavorited = is_game_favorited($user_id, $game_id);
-                                    $favorite_url = $_favorite_url . '?' . $_primary_key_column . '=' . $game_id . '&' . $query_string;
+                                    $favorite_url = $_favorite_url . '?' . $_primary_key_column . '=' . $game_id . '&user_id=' . $user_id . '&' . $query_string;
                                     ?>
                                     <a href="<?php echo $favorite_url; ?>" class="btn btn-<?php echo $isFavorited ? 'danger' : 'success'; ?>">
                                         <?php echo $isFavorited ? 'Unfavorite' : 'Favorite'; ?>

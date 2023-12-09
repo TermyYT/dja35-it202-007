@@ -43,6 +43,7 @@ session_start();
             <?php if (is_logged_in()) : ?>
                 <li class="nav-item"><a class="nav-link" href="<?php echo get_url('home.php'); ?>">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?php echo get_url('profile.php'); ?>">Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?php echo get_url('user_favorites.php'); ?>">Favorites</a></li>
 
                 <?php if (!has_role("Admin")) : ?>
                     <li class="nav-item dropdown">
@@ -71,6 +72,8 @@ session_start();
                         <a class="dropdown-item" href="<?php echo get_url('admin/game_profile.php'); ?>">Game Profile</a>
                         <a class="dropdown-item" href="<?php echo get_url('admin/game_viewer.php'); ?>">Game Viewer</a>
                         <a class="dropdown-item" href="<?php echo get_url('admin/game_list.php'); ?>">Game List</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/all_favorites.php'); ?>">Favorited Games</a>
+                        <a class="dropdown-item" href="<?php echo get_url('admin/unfavorited_games.php'); ?>">Unfavorited Games</a>
                     </div>
                 </li>
             <?php endif; ?>

@@ -12,7 +12,7 @@ if (!is_logged_in()) {
     redirect("login.php");
 }
 
-$user_id = get_user_id();
+$user_id = se($_GET, "user_id", get_user_id(), false);
 $game_id = (int)se($_GET, "id", 0, false);
 
 if ($game_id <= 0) {
