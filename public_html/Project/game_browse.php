@@ -18,24 +18,8 @@ foreach ($games as &$game) {
 }
 unset($game); // Unset reference to the last element
 
-/*// Defines the columns to be displayed.
-$columnsToShow = [
-    'id',
-    'title',
-    'description',
-    'releaseDate',
-    'originalPrice',
-    'discountPrice',
-    'currencyCode'
-];
-
-// Extracts only the required columns from the games data.
-$gamesToShow = array_map(function ($game) use ($columnsToShow) {
-    return array_intersect_key($game, array_flip($columnsToShow));
-}, $games);*/
-
 // Creates table with corresponding values. USER version doesn't have a delete function.
-if (has_role("Admin")) {
+if (has_role("Admin")) { // DJA35 - 12/13/2023 - Added favorite_game as a button.
     $table = ["data" => $games,
     "favorite_url" => "favorite_game.php", 
     "view_url" => "admin/game_viewer.php",
@@ -47,7 +31,7 @@ if (has_role("Admin")) {
     "view_url" => "game_view.php",
     "edit_url" => "game_edit.php"];
 }
-$table["ignored_columns"] = [/*"id",*/ "publisherName", "url", "created", "modified"];
+$table["ignored_columns"] = ["publisherName", "url", "created", "modified"];
 ?>
 
 <div class="container-fluid">

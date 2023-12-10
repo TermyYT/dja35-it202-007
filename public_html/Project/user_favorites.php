@@ -18,7 +18,7 @@ foreach ($favorited_games as &$game) {
 }
 unset($game); // Unset reference to the last element
 
-if (has_role("Admin")) {
+if (has_role("Admin")) { // DJA35 - 12/13/2023 - The user's favorites page.
     $table = [
         "data" => $favorited_games,
         "favorite_url" => "favorite_game.php", // Counts as "deleting" the relationship.
