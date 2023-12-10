@@ -69,7 +69,7 @@
                 <?php foreach ($_data as $row) : ?>
                     <tr>
                         <?php foreach ($row as $k => $v) : ?>
-                            <?php if (!in_array($k, $_ignored_columns)) : ?>
+                            <?php if (!in_array($k, $_ignored_columns)) : ?> <!-- DJA35 - 12/13/2023 -->
                                 <?php if ($k == "username" && in_array("user_id", array_keys($row))) : ?>
                                     <td><a href="<?php get_url("profile.php?id=", true); // Linking to the user's profile via the table.
                                                 se($row, "user_id"); ?>"><?php se($v); ?></a></td>
@@ -81,7 +81,7 @@
                         <?php $query_string = http_build_query($_GET); ?>
                         <?php if ($_has_atleast_one_url) : ?>
                             <td>
-                                <?php if ($_favorite_url) : ?>
+                                <?php if ($_favorite_url) : ?> <!-- DJA35 - 12/13/2023 -->
                                     <?php // Dictates the function of the Favorite/Unfavorite button in the table.
                                     $game_id = $row[$_primary_key_column];
                                     $user_id = se($row, "user_id", get_user_id(), false);

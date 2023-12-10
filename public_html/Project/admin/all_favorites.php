@@ -25,7 +25,7 @@ $stmt = $db->query($total_records_query);
 $total_records_result = $stmt->fetch(PDO::FETCH_ASSOC);
 $total_record_count = isset($total_records_result['totalRecords']) ? (int)$total_records_result['totalRecords'] : 0;
 
-if (has_role("Admin")) {
+if (has_role("Admin")) { // DJA35 - 12/13/2023 - The All Users Association page.
     $table = [
         "data" => $all_favorited_games,
         "favorite_url" => "/../Project/favorite_game.php", // Counts as "deleting" the relationship.

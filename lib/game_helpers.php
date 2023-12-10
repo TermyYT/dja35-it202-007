@@ -188,7 +188,7 @@ function _build_search_query(&$params, $search)
     global $total;
     $total = (int)get_potential_total_records($total_query . $filter_query, $params);
 
-    global $totalSearch;
+    global $totalSearch; // DJA35 - 12/13/2023 - Checking for isFavorite when displaying the All Unfavorited Games table.
     $filter = " AND isFavorite = :isFavorite";
     if(!isset($totalSearch)){
         $totalSearch = [];

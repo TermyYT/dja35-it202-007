@@ -157,7 +157,7 @@ function _build_all_favorites_search_query(&$params, $search) // Assembling the 
     global $shown_records;
     $shown_records = (int)get_potential_total_records($total_query, $params);
 
-    $limit = (int)se($search, "limit", 10, false);
+    $limit = (int)se($search, "limit", 10, false); // DJA35 - 12/13/2023 - Setting the filtering limits. Default is 10 records per page.
     if (empty($limit) || $limit === 0) {
         $limit = 10;
     }

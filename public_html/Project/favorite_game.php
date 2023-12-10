@@ -12,7 +12,8 @@ if (!is_logged_in()) {
     redirect("login.php");
 }
 
-$user_id = se($_GET, "user_id", get_user_id(), false);
+// DJA35 - 12/13/2023 - The favorite_game temp page that's activated when clicking the Favorite/Unfavorite button.
+$user_id = se($_GET, "user_id", get_user_id(), false); 
 $game_id = (int)se($_GET, "id", 0, false);
 
 if ($game_id <= 0) {
